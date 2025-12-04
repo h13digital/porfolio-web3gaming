@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hiệp Nguyễn - Performance Marketing Architect</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-web3: #8a2be2;
+            --secondary-esports: #00ff88;
+            --accent-danger: #ff4466;
+            --accent-warning: #ffaa00;
+            --accent-success: #00ff88;
+            --accent-info: #2b9be2;
+            --dark-bg: #0a0a15;
+            --card-bg: #121225;
+            --card-border: #1e1e3a;
+            --text-primary: #ffffff;
+            --text-secondary: #8b8ba7;
+            --text-muted: #5a5a7a;
+            --gradient-primary: linear-gradient(135deg, #8a2be2, #6a3dc9);
+            --gradient-secondary: linear-gradient(135deg, #00ff88, #00cc6a);
+            --shadow-subtle: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --shadow-elevated: 0 8px 40px rgba(0, 0, 0, 0.4);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* NAVIGATION */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(10, 10, 21, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(30, 30, 58, 0.5);
+        }
+        
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-primary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .logo-text {
+            font-size: 22px;
+            font-weight: 800;
+            background: linear-gradient(to right, var(--text-primary), var(--primary-web3));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+        }
+        
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .nav-link:hover {
+            color: var(--text-primary);
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--gradient-primary);
+            transition: width 0.3s;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .nav-cta {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 12px 28px;
+            border-radius: 10px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .nav-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(138, 43, 226, 0.3);
+        }
+        
+        /* HERO SECTION */
+        .hero {
+            padding: 180px 0 100px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(138, 43, 226, 0.1) 0%, transparent 25%),
+                radial-gradient(circle at 80% 70%, rgba(0, 255, 136, 0.05) 0%, transparent 25%);
+            z-index: -1;
+        }
+        
+        .hero-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+        
+        @media (max-width: 1100px) {
+            .hero-container {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+        }
+        
+        .hero-content h1 {
+            font-size: 56px;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            background: linear-gradient(to right, var(--text-primary), var(--primary-web3));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .hero-highlight {
+            color: var(--secondary-esports);
+            position: relative;
+        }
+        
+        .hero-highlight::after {
+            content: '';
+            position: absolute;
+            bottom: 5px;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background-color: rgba(0, 255, 136, 0.2);
+            z-index: -1;
+        }
+        
+        .hero-subtitle {
+            font-size: 20px;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            max-width: 600px;
+        }
+        
+        .hero-stats {
+            display: flex;
+            gap: 40px;
+            margin-top: 50px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--secondary-esports);
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .hero-visual {
+            position: relative;
+        }
+        
+        .dashboard-preview {
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: var(--shadow-elevated);
+            border: 1px solid var(--card-border);
+            transform: perspective(1000px) rotateY(-10deg);
+            transition: transform 0.5s;
+        }
+        
+        .dashboard-preview:hover {
+            transform: perspective(1000px) rotateY(0deg);
+        }
+        
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .preview-title {
+            font-size: 18px;
+            font-weight: 700;
+        }
+        
+        .preview-metrics {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .preview-metric {
+            background-color: rgba(30, 30, 58, 0.5);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .metric-value {
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 5px;
+        }
+        
+        .metric-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .preview-chart {
+            height: 120px;
+            background: linear-gradient(90deg, rgba(138, 43, 226, 0.2), rgba(0, 255, 136, 0.1));
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        /* DASHBOARDS SECTION */
+        .dashboards-section {
+            padding: 100px 0;
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        
+        .section-title {
+            font-size: 42px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            background: linear-gradient(to right, var(--text-primary), var(--primary-web3));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .section-subtitle {
+            font-size: 18px;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .dashboards-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+        
+        @media (max-width: 1100px) {
+            .dashboards-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .dashboards-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .dashboard-card {
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid var(--card-border);
+            box-shadow: var(--shadow-subtle);
+            transition: all 0.4s;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-elevated);
+            border-color: var(--primary-web3);
+        }
+        
+        .dashboard-image {
+            height: 200px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        
+        .dashboard-1 {
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.2), rgba(0, 255, 136, 0.1)), 
+                        url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80');
+        }
+        
+        .dashboard-2 {
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.2), rgba(0, 255, 136, 0.1)), 
+                        url('https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80');
+        }
+        
+        .dashboard-3 {
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.2), rgba(0, 255, 136, 0.1)), 
+                        url('https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80');
+        }
+        
+        .dashboard-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: rgba(10, 10, 21, 0.9);
+            color: var(--text-primary);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 700;
+            border: 1px solid var(--primary-web3);
+        }
+        
+        .dashboard-content {
+            padding: 30px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .dashboard-title {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .dashboard-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        
+        .icon-1 {
+            background-color: rgba(255, 68, 102, 0.1);
+            color: var(--accent-danger);
+        }
+        
+        .icon-2 {
+            background-color: rgba(43, 155, 226, 0.1);
+            color: var(--accent-info);
+        }
+        
+        .icon-3 {
+            background-color: rgba(0, 255, 136, 0.1);
+            color: var(--accent-success);
+        }
+        
+        .dashboard-description {
+            color: var(--text-secondary);
+            margin-bottom: 25px;
+            flex: 1;
+        }
+        
+        .dashboard-features {
+            margin-bottom: 25px;
+        }
+        
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .feature i {
+            color: var(--secondary-esports);
+        }
+        
+        .dashboard-cta {
+            background: var(--gradient-primary);
+            color: white;
+            text-align: center;
+            padding: 14px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: all 0.3s;
+            display: block;
+        }
+        
+        .dashboard-cta:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(138, 43, 226, 0.3);
+        }
+        
+        /* ABOUT SECTION */
+        .about-section {
+            padding: 100px 0;
+            background-color: rgba(18, 18, 37, 0.5);
+            border-radius: 40px;
+            margin: 50px 20px;
+        }
+        
+        .about-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+        
+        @media (max-width: 1100px) {
+            .about-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .about-image {
+            text-align: center;
+        }
+        
+        .profile-container {
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .profile-image {
+            width: 280px;
+            height: 280px;
+            border-radius: 50%;
+            background-color: var(--card-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 120px;
+            color: var(--text-primary);
+        }
+        
+        .about-content h2 {
+            font-size: 42px;
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+        
+        .about-tagline {
+            font-size: 20px;
+            color: var(--secondary-esports);
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+        
+        .about-description {
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+            font-size: 17px;
+            line-height: 1.8;
+        }
+        
+        .expertise-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .expertise-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .expertise-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background-color: rgba(138, 43, 226, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            color: var(--primary-web3);
+        }
+        
+        .expertise-text h4 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .expertise-text p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        /* CONTACT SECTION */
+        .contact-section {
+            padding: 100px 0;
+            text-align: center;
+        }
+        
+        .contact-cta {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 20px 40px;
+            border-radius: 15px;
+            font-size: 20px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s;
+        }
+        
+        .contact-cta:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(138, 43, 226, 0.3);
+        }
+        
+        /* FOOTER */
+        .footer {
+            padding: 60px 0 40px;
+            background-color: rgba(10, 10, 21, 0.8);
+            border-top: 1px solid var(--card-border);
+        }
+        
+        .footer-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        @media (max-width: 768px) {
+            .footer-container {
+                flex-direction: column;
+                gap: 30px;
+                text-align: center;
+            }
+        }
+        
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .footer-logo-text h3 {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 5px;
+        }
+        
+        .footer-logo-text p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .social-link {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background-color: var(--card-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+            font-size: 20px;
+            text-decoration: none;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+        }
+        
+        .social-link:hover {
+            background-color: rgba(138, 43, 226, 0.1);
+            border-color: var(--primary-web3);
+            transform: translateY(-3px);
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 40px;
+            color: var(--text-muted);
+            font-size: 14px;
+            border-top: 1px solid rgba(30, 30, 58, 0.5);
+            margin-top: 40px;
+        }
+        
+        /* ANIMATIONS */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        /* RESPONSIVE */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .nav-links {
+                position: fixed;
+                top: 80px;
+                left: 0;
+                right: 0;
+                background-color: var(--dark-bg);
+                flex-direction: column;
+                padding: 30px;
+                gap: 30px;
+                transform: translateY(-100%);
+                opacity: 0;
+                transition: all 0.3s;
+                border-bottom: 1px solid var(--card-border);
+            }
+            
+            .nav-links.active {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            
+            .hero-content h1 {
+                font-size: 42px;
+            }
+            
+            .section-title {
+                font-size: 36px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- NAVIGATION -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <div class="logo-icon">HN</div>
+                <div class="logo-text">HIEP NGUYEN</div>
+            </div>
+            
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <div class="nav-links" id="navLinks">
+                <a href="#home" class="nav-link">Home</a>
+                <a href="#dashboards" class="nav-link">Dashboards</a>
+                <a href="#about" class="nav-link">About</a>
+                <a href="#contact" class="nav-link">Contact</a>
+                <a href="https://h13digital.github.io" target="_blank" class="nav-cta">
+                    <i class="fas fa-external-link-alt"></i> Portfolio
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section class="hero" id="home">
+        <div class="hero-background"></div>
+        <div class="container">
+            <div class="hero-container">
+                <div class="hero-content">
+                    <h1>Senior Performance Marketing <span class="hero-highlight">Architect</span></h1>
+                    <p class="hero-subtitle">
+                        Transforming Esport × Web3 growth through data-driven strategies, 
+                        advanced analytics, and scalable marketing systems. Specializing in 
+                        building performance dashboards that drive actionable insights.
+                    </p>
+                    
+                    <div class="hero-stats">
+                        <div class="stat-item">
+                            <div class="stat-number">3</div>
+                            <div class="stat-label">Dashboard Systems</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">142K</div>
+                            <div class="stat-label">Monthly Revenue</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">5.2</div>
+                            <div class="stat-label">Payback Months</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="hero-visual floating">
+                    <div class="dashboard-preview">
+                        <div class="preview-header">
+                            <div class="preview-title">Growth Command Center</div>
+                            <div style="color: var(--secondary-esports); font-size: 12px; font-weight: 600;">LIVE</div>
+                        </div>
+                        
+                        <div class="preview-metrics">
+                            <div class="preview-metric">
+                                <div class="metric-value">$1.24</div>
+                                <div class="metric-label">CPW</div>
+                            </div>
+                            <div class="preview-metric">
+                                <div class="metric-value">3:12</div>
+                                <div class="metric-label">Time-to-TX</div>
+                            </div>
+                            <div class="preview-metric">
+                                <div class="metric-value">48%</div>
+                                <div class="metric-label">D7 Retention</div>
+                            </div>
+                            <div class="preview-metric">
+                                <div class="metric-value">78/100</div>
+                                <div class="metric-label">Network Score</div>
+                            </div>
+                        </div>
+                        
+                        <div class="preview-chart"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- DASHBOARDS SECTION -->
+    <section class="dashboards-section" id="dashboards">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Esport × Web3 Dashboard Systems</h2>
+                <p class="section-subtitle">
+                    Three-tier dashboard architecture designed for different stakeholders - 
+                    from real-time operations to executive decision-making
+                </p>
+            </div>
+            
+            <div class="dashboards-grid">
+                <!-- Dashboard 1 -->
+                <div class="dashboard-card">
+                    <div class="dashboard-image dashboard-1">
+                        <div class="dashboard-badge">Real-time</div>
+                    </div>
+                    <div class="dashboard-content">
+                        <div class="dashboard-title">
+                            <div class="dashboard-icon icon-1">
+                                <i class="fas fa-tachometer-alt"></i>
+                            </div>
+                            <span>Growth Command Center</span>
+                        </div>
+                        <p class="dashboard-description">
+                            Real-time operational dashboard for growth teams. Monitors acquisition, activation, 
+                            engagement, and monetization metrics with live alerts and automated actions.
+                        </p>
+                        
+                        <div class="dashboard-features">
+                            <div class="feature">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Real-time metrics & alerts</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Automated anomaly detection</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Cross-channel performance</span>
+                            </div>
+                        </div>
+                        
+                        <a href="#dashboard1" class="dashboard-cta" onclick="openDashboard('dashboard1')">
+                            <i class="fas fa-external-link-alt"></i> View Dashboard
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Dashboard 2 -->
+                <div class="dashboard-card">
+                    <div class="dashboard-image dashboard-2">
+                        <div class="dashboard-badge">Analytical</div>
+                    </div>
+                    <div class="dashboard-content">
+                        <div class="dashboard-title">
+                            <div class="dashboard-icon icon-2">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <span>Deep Dive Analytics</span>
+                        </div>
+                        <p class="dashboard-description">
+                            Comprehensive analytical dashboard for product and marketing teams. 
+                            Features cohort analysis, funnel visualization, segmentation, and 
+                            network effects tracking.
+                        </p>
+                        
+                        <div class="dashboard-features">
+                            <div class="feature">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Cohort analysis & retention</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Funnel visualization</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-check-circle"></i>
+                                <span>User segmentation</span>
+                            </div>
+                        </div>
+                        
+                        <a href="#dashboard2" class="dashboard-cta" onclick="openDashboard('dashboard2')">
+                            <i class="fas fa-external-link-alt"></i> View Dashboard
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Dashboard 3 -->
+                <div class="dashboard-card">
+                    <div class="dashboard-image dashboard-3">
+                        <div class="dashboard-badge">Executive</div>
+                    </div>
+                    <div class="dashboard-content">
+                        <div class="dashboard-title">
+                            <div class="dashboard-icon icon-3">
+                                <i class="fas fa-briefcase"></i>
+                            </div>
+                            <span>Executive Summary</span>
+                        </div>
+                        <p class="dashboard-description">
+                            Investor-ready executive dashboard with key business metrics, 
+                            quarterly performance, forecasts, and strategic initiatives. 
+                            Optimized for board presentations.
+                        </p>
+                        
+                        <div class="dashboard-features">
+                            <div class="feature">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Investor metrics & forecasts</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Quarterly performance</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Presentation mode</span>
+                            </div>
+                        </div>
+                        
+                        <a href="#dashboard3" class="dashboard-cta" onclick="openDashboard('dashboard3')">
+                            <i class="fas fa-external-link-alt"></i> View Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ABOUT SECTION -->
+    <section class="about-section" id="about">
+        <div class="container">
+            <div class="about-container">
+                <div class="about-image">
+                    <div class="profile-container">
+                        <div class="profile-image">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="about-content">
+                    <h2>Hiệp Nguyễn</h2>
+                    <div class="about-tagline">Senior Performance Marketing Architect</div>
+                    
+                    <p class="about-description">
+                        With expertise in Esport × Web3 ecosystems, I architect data-driven marketing systems 
+                        that deliver measurable business impact. My approach combines growth hacking, 
+                        data analytics, and marketing automation to build scalable acquisition engines 
+                        with positive unit economics.
+                    </p>
+                    
+                    <div class="expertise-list">
+                        <div class="expertise-item">
+                            <div class="expertise-icon">
+                                <i class="fas fa-chart-pie"></i>
+                            </div>
+                            <div class="expertise-text">
+                                <h4>Data Analytics</h4>
+                                <p>Advanced analytics & dashboard architecture</p>
+                            </div>
+                        </div>
+                        
+                        <div class="expertise-item">
+                            <div class="expertise-icon">
+                                <i class="fas fa-rocket"></i>
+                            </div>
+                            <div class="expertise-text">
+                                <h4>Growth Marketing</h4>
+                                <p>Scalable acquisition & retention strategies</p>
+                            </div>
+                        </div>
+                        
+                        <div class="expertise-item">
+                            <div class="expertise-icon">
+                                <i class="fab fa-ethereum"></i>
+                            </div>
+                            <div class="expertise-text">
+                                <h4>Web3 Marketing</h4>
+                                <p>Tokenomics, NFTs, and community growth</p>
+                            </div>
+                        </div>
+                        
+                        <div class="expertise-item">
+                            <div class="expertise-icon">
+                                <i class="fas fa-gamepad"></i>
+                            </div>
+                            <div class="expertise-text">
+                                <h4>Esports Ecosystems</h4>
+                                <p>Tournament marketing & player engagement</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <a href="https://h13digital.github.io" target="_blank" class="nav-cta">
+                        <i class="fas fa-external-link-alt"></i> View Full Portfolio
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTACT SECTION -->
+    <section class="contact-section" id="contact">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Let's Build Something Amazing</h2>
+                <p class="section-subtitle">
+                    Interested in implementing data-driven marketing systems for your Esport × Web3 project?
+                </p>
+            </div>
+            
+            <a href="mailto:contact@example.com" class="contact-cta">
+                <i class="fas fa-envelope"></i> Get in Touch
+            </a>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-container">
+                <div class="footer-logo">
+                    <div class="logo-icon">HN</div>
+                    <div class="footer-logo-text">
+                        <h3>Hiệp Nguyễn</h3>
+                        <p>Senior Performance Marketing Architect</p>
+                    </div>
+                </div>
+                
+                <div class="social-links">
+                    <a href="https://github.com/h13digital" target="_blank" class="social-link">
+                        <i class="fab fa-github"></i>
+                    </a>
+                    <a href="https://linkedin.com/in/" target="_blank" class="social-link">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                    <a href="https://twitter.com/" target="_blank" class="social-link">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="https://h13digital.github.io" target="_blank" class="social-link">
+                        <i class="fas fa-globe"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                &copy; 2025 Hiệp Nguyễn. All rights reserved. | Esport × Web3 Marketing Architecture
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile Menu Toggle
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const navLinks = document.getElementById('navLinks');
+        
+        mobileMenuBtn.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+        
+        // Close mobile menu when clicking a link
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.classList.remove('active');
+            });
+        });
+        
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+        
+        // Open Dashboard in New Tab
+        function openDashboard(dashboardId) {
+            const dashboards = {
+                'dashboard1': 'dashboard1.html',
+                'dashboard2': 'dashboard2.html',
+                'dashboard3': 'dashboard3.html'
+            };
+            
+            // In a real implementation, these would be actual HTML files
+            // For demo purposes, we'll show a preview modal
+            showDashboardPreview(dashboardId);
+        }
+        
+        // Show Dashboard Preview Modal
+        function showDashboardPreview(dashboardId) {
+            const dashboardNames = {
+                'dashboard1': 'Growth Command Center',
+                'dashboard2': 'Deep Dive Analytics',
+                'dashboard3': 'Executive Summary'
+            };
+            
+            const dashboardDescriptions = {
+                'dashboard1': 'Real-time operational dashboard for growth teams with live metrics and alerts.',
+                'dashboard2': 'Analytical dashboard for product and marketing teams with cohort analysis and funnel visualization.',
+                'dashboard3': 'Executive dashboard for investors and board members with business metrics and forecasts.'
+            };
+            
+            // Create modal
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0, 0, 0, 0.9);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 2000;
+                padding: 20px;
+                animation: fadeIn 0.3s;
+            `;
+            
+            modal.innerHTML = `
+                <div style="background-color: var(--card-bg); border-radius: 20px; padding: 40px; max-width: 800px; width: 100%; border: 1px solid var(--card-border); position: relative;">
+                    <button id="closeModal" style="position: absolute; top: 20px; right: 20px; background: none; border: none; color: var(--text-secondary); font-size: 24px; cursor: pointer;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    
+                    <h2 style="font-size: 32px; margin-bottom: 20px; color: var(--text-primary);">${dashboardNames[dashboardId]}</h2>
+                    <p style="color: var(--text-secondary); margin-bottom: 30px; font-size: 18px;">${dashboardDescriptions[dashboardId]}</p>
+                    
+                    <div style="background-color: rgba(30, 30, 58, 0.5); border-radius: 15px; padding: 30px; margin-bottom: 30px;">
+                        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+                            <div style="width: 50px; height: 50px; border-radius: 12px; background-color: rgba(138, 43, 226, 0.2); display: flex; align-items: center; justify-content: center; color: var(--primary-web3); font-size: 24px;">
+                                <i class="fas fa-laptop-code"></i>
+                            </div>
+                            <div>
+                                <h3 style="font-size: 20px; margin-bottom: 5px;">Dashboard Preview</h3>
+                                <p style="color: var(--text-secondary); font-size: 14px;">Full interactive dashboard available upon request</p>
+                            </div>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px;">
+                            <div style="background-color: rgba(138, 43, 226, 0.1); padding: 20px; border-radius: 10px; text-align: center;">
+                                <div style="font-size: 24px; font-weight: 800; margin-bottom: 10px; color: var(--primary-web3);">$1.24</div>
+                                <div style="font-size: 14px; color: var(--text-secondary);">CPW</div>
+                            </div>
+                            <div style="background-color: rgba(0, 255, 136, 0.1); padding: 20px; border-radius: 10px; text-align: center;">
+                                <div style="font-size: 24px; font-weight: 800; margin-bottom: 10px; color: var(--secondary-esports);">48%</div>
+                                <div style="font-size: 14px; color: var(--text-secondary);">D7 Retention</div>
+                            </div>
+                            <div style="background-color: rgba(255, 170, 0, 0.1); padding: 20px; border-radius: 10px; text-align: center;">
+                                <div style="font-size: 24px; font-weight: 800; margin-bottom: 10px; color: var(--accent-warning);">5.2</div>
+                                <div style="font-size: 14px; color: var(--text-secondary);">Payback Months</div>
+                            </div>
+                        </div>
+                        
+                        <div style="height: 200px; background: linear-gradient(90deg, rgba(138, 43, 226, 0.2), rgba(0, 255, 136, 0.1)); border-radius: 10px;"></div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 20px;">
+                        <a href="#" style="flex: 1; background: var(--gradient-primary); color: white; text-align: center; padding: 16px; border-radius: 10px; text-decoration: none; font-weight: 700; transition: all 0.3s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+                            <i class="fas fa-external-link-alt"></i> Request Full Access
+                        </a>
+                        <button id="viewCode" style="flex: 1; background-color: rgba(30, 30, 58, 0.5); color: var(--text-primary); text-align: center; padding: 16px; border-radius: 10px; border: 1px solid var(--card-border); font-weight: 700; cursor: pointer; transition: all 0.3s;" onmouseover="this.style.backgroundColor='rgba(138, 43, 226, 0.1)'" onmouseout="this.style.backgroundColor='rgba(30, 30, 58, 0.5)'">
+                            <i class="fab fa-github"></i> View Code
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Close modal
+            document.getElementById('closeModal').addEventListener('click', () => {
+                document.body.removeChild(modal);
+            });
+            
+            // View code button
+            document.getElementById('viewCode').addEventListener('click', () => {
+                alert('In a real portfolio, this would link to GitHub repository with full source code.\n\nDashboard built with: HTML5, CSS3, JavaScript, Chart.js, Web3 APIs');
+            });
+            
+            // Close on background click
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    document.body.removeChild(modal);
+                }
+            });
+            
+            // Add animation CSS
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes fadeIn {
+                    from { opacity: 0; }
+                    to { opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        
+        // Add scroll effect to navbar
+        window.addEventListener('scroll', () => {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 100) {
+                navbar.style.backgroundColor = 'rgba(10, 10, 21, 0.98)';
+                navbar.style.backdropFilter = 'blur(15px)';
+            } else {
+                navbar.style.backgroundColor = 'rgba(10, 10, 21, 0.95)';
+                navbar.style.backdropFilter = 'blur(10px)';
+            }
+        });
+        
+        // Initialize animations on load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Add animation to dashboard cards on scroll
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+            
+            // Observe dashboard cards
+            document.querySelectorAll('.dashboard-card').forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+                card.style.transition = 'opacity 0.6s, transform 0.6s';
+                observer.observe(card);
+            });
+            
+            // Observe about section
+            const aboutSection = document.querySelector('.about-section');
+            aboutSection.style.opacity = '0';
+            aboutSection.style.transform = 'translateY(30px)';
+            aboutSection.style.transition = 'opacity 0.8s, transform 0.8s';
+            
+            const aboutObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            aboutObserver.observe(aboutSection);
+        });
+    </script>
+</body>
+</html>

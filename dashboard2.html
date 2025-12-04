@@ -1,0 +1,1901 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASSA Deep Dive Analytics</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/luxon@3.3.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.3.0"></script>
+    <style>
+        :root {
+            --primary-web3: #8a2be2;
+            --secondary-esports: #00ff88;
+            --accent-danger: #ff4466;
+            --accent-warning: #ffaa00;
+            --accent-success: #00ff88;
+            --accent-info: #2b9be2;
+            --dark-bg: #0a0a15;
+            --card-bg: #121225;
+            --card-border: #1e1e3a;
+            --text-primary: #ffffff;
+            --text-secondary: #8b8ba7;
+            --text-muted: #5a5a7a;
+            --tab-active: rgba(138, 43, 226, 0.2);
+            --tab-hover: rgba(138, 43, 226, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Inter', -apple-system, sans-serif;
+        }
+        
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-primary);
+            padding: 20px;
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(138, 43, 226, 0.08) 0%, transparent 25%),
+                radial-gradient(circle at 80% 70%, rgba(0, 255, 136, 0.05) 0%, transparent 25%);
+        }
+        
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+        
+        /* HEADER */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--card-border);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo-icon {
+            background: linear-gradient(135deg, var(--primary-web3), var(--secondary-esports));
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: bold;
+        }
+        
+        .logo-text h1 {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(to right, var(--text-primary), var(--accent-info));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .logo-text p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        .analytics-badge {
+            background-color: rgba(43, 155, 226, 0.2);
+            color: var(--accent-info);
+            font-size: 11px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            border: 1px solid rgba(43, 155, 226, 0.3);
+        }
+        
+        /* TABS */
+        .tabs-container {
+            margin-bottom: 25px;
+        }
+        
+        .tabs {
+            display: flex;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 6px;
+            border: 1px solid var(--card-border);
+            margin-bottom: 25px;
+            overflow-x: auto;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 14px 24px;
+            text-align: center;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .tab:hover {
+            background-color: var(--tab-hover);
+        }
+        
+        .tab.active {
+            background-color: var(--tab-active);
+            color: var(--primary-web3);
+            box-shadow: 0 4px 12px rgba(138, 43, 226, 0.15);
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* CONTENT CARDS */
+        .content-card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 30px;
+            border: 1px solid var(--card-border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        
+        .card-title {
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .card-title i {
+            color: var(--primary-web3);
+        }
+        
+        .card-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .filter-btn {
+            background-color: rgba(30, 30, 58, 0.5);
+            border: 1px solid var(--card-border);
+            color: var(--text-secondary);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+        
+        .filter-btn:hover {
+            background-color: rgba(138, 43, 226, 0.1);
+            color: var(--primary-web3);
+        }
+        
+        /* FUNNEL VISUALIZATION */
+        .funnel-container {
+            padding: 20px 0;
+        }
+        
+        .funnel-steps {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            margin-bottom: 40px;
+        }
+        
+        .funnel-steps::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(to right, var(--primary-web3), var(--secondary-esports));
+            z-index: 1;
+        }
+        
+        .funnel-step {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            width: 120px;
+        }
+        
+        .step-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--card-bg);
+            border: 4px solid var(--primary-web3);
+            margin: 0 auto 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--primary-web3);
+            transition: all 0.3s;
+        }
+        
+        .funnel-step:hover .step-circle {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(138, 43, 226, 0.4);
+        }
+        
+        .step-label {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-primary);
+        }
+        
+        .step-value {
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+        
+        .step-rate {
+            font-size: 14px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        
+        .rate-up { color: var(--accent-success); }
+        .rate-down { color: var(--accent-danger); }
+        
+        .funnel-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+        
+        .funnel-metric {
+            background-color: rgba(30, 30, 58, 0.5);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--card-border);
+        }
+        
+        .metric-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .metric-value {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+        
+        .metric-detail {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        /* HEATMAP */
+        .heatmap-container {
+            height: 400px;
+            position: relative;
+            margin: 30px 0;
+        }
+        
+        .heatmap-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            height: 100%;
+        }
+        
+        .heatmap-cell {
+            background-color: rgba(30, 30, 58, 0.5);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+            cursor: pointer;
+            padding: 15px 10px;
+        }
+        
+        .heatmap-cell:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary-web3);
+            box-shadow: 0 8px 20px rgba(138, 43, 226, 0.2);
+        }
+        
+        .heatmap-label {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+        
+        .heatmap-value {
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+        
+        .heatmap-rate {
+            font-size: 12px;
+        }
+        
+        /* COHORT TABLE */
+        .cohort-table-container {
+            overflow-x: auto;
+            margin: 30px 0;
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+        }
+        
+        .cohort-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+        
+        .cohort-table th {
+            background-color: rgba(30, 30, 58, 0.8);
+            padding: 16px;
+            text-align: center;
+            font-weight: 700;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--card-border);
+            position: sticky;
+            top: 0;
+        }
+        
+        .cohort-table td {
+            padding: 16px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .cohort-period {
+            background-color: rgba(138, 43, 226, 0.1);
+            font-weight: 600;
+            text-align: left;
+            padding-left: 24px;
+        }
+        
+        .retention-cell {
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .retention-value {
+            font-size: 16px;
+            font-weight: 700;
+        }
+        
+        .retention-trend {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        /* NETWORK GRAPH */
+        .network-graph-container {
+            height: 500px;
+            position: relative;
+            margin: 30px 0;
+        }
+        
+        .graph-legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+        }
+        
+        /* SEGMENT DETAILS */
+        .segment-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        
+        .segment-card {
+            background-color: rgba(30, 30, 58, 0.5);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid var(--card-border);
+            transition: all 0.3s;
+        }
+        
+        .segment-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary-web3);
+            box-shadow: 0 12px 30px rgba(138, 43, 226, 0.15);
+        }
+        
+        .segment-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--card-border);
+        }
+        
+        .segment-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+        
+        .segment-players .segment-icon {
+            background-color: rgba(0, 255, 136, 0.15);
+            color: var(--secondary-esports);
+            border: 2px solid rgba(0, 255, 136, 0.3);
+        }
+        
+        .segment-traders .segment-icon {
+            background-color: rgba(138, 43, 226, 0.15);
+            color: var(--primary-web3);
+            border: 2px solid rgba(138, 43, 226, 0.3);
+        }
+        
+        .segment-collectors .segment-icon {
+            background-color: rgba(255, 170, 0, 0.15);
+            color: var(--accent-warning);
+            border: 2px solid rgba(255, 170, 0, 0.3);
+        }
+        
+        .segment-defi .segment-icon {
+            background-color: rgba(43, 155, 226, 0.15);
+            color: var(--accent-info);
+            border: 2px solid rgba(43, 155, 226, 0.3);
+        }
+        
+        .segment-title h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .segment-title p {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .segment-metrics {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        
+        .segment-metric {
+            text-align: center;
+        }
+        
+        .metric-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+        
+        .metric-value {
+            font-size: 22px;
+            font-weight: 800;
+        }
+        
+        .metric-change {
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            margin-top: 4px;
+        }
+        
+        /* FOOTER */
+        .footer {
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid var(--card-border);
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+        
+        .insight-box {
+            background-color: var(--card-bg);
+            display: inline-block;
+            padding: 16px 32px;
+            border-radius: 20px;
+            border: 1px solid var(--card-border);
+            max-width: 800px;
+        }
+        
+        .insight-title {
+            color: var(--accent-info);
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .insight-text {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        
+        .highlight {
+            color: var(--secondary-esports);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">α</div>
+                <div class="logo-text">
+                    <h1>ASSA Deep Dive Analytics</h1>
+                    <p>Esport × Web3 Intelligence | Product & Marketing Insights <span class="analytics-badge">DEEP DIVE MODE</span></p>
+                </div>
+            </div>
+            
+            <div class="card-controls">
+                <div class="filter-btn">
+                    <i class="far fa-calendar"></i>
+                    <span>15/04 - 22/04/2025</span>
+                </div>
+                <div class="filter-btn" onclick="exportData()">
+                    <i class="fas fa-download"></i>
+                    <span>Export CSV</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- TABS -->
+        <div class="tabs-container">
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('funnel')">
+                    <i class="fas fa-filter"></i> Acquisition Funnel
+                </button>
+                <button class="tab" onclick="switchTab('cohort')">
+                    <i class="fas fa-layer-group"></i> Cohort Retention
+                </button>
+                <button class="tab" onclick="switchTab('network')">
+                    <i class="fas fa-project-diagram"></i> Network Effects
+                </button>
+                <button class="tab" onclick="switchTab('segments')">
+                    <i class="fas fa-chart-pie"></i> User Segments
+                </button>
+                <button class="tab" onclick="switchTab('diagnostics')">
+                    <i class="fas fa-stethoscope"></i> Health Diagnostics
+                </button>
+            </div>
+        </div>
+        
+        <!-- TAB 1: ACQUISITION FUNNEL -->
+        <div id="tab-funnel" class="tab-content active">
+            <div class="content-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-filter"></i>
+                        Acquisition Funnel Analysis
+                    </div>
+                    <div class="card-controls">
+                        <div class="filter-btn" onclick="filterBySource('all')">
+                            <i class="fas fa-globe"></i>
+                            <span>All Sources</span>
+                        </div>
+                        <div class="filter-btn" onclick="filterBySource('web3')">
+                            <i class="fab fa-ethereum"></i>
+                            <span>Web3 Only</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="funnel-container">
+                    <div class="funnel-steps">
+                        <div class="funnel-step">
+                            <div class="step-circle">1</div>
+                            <div class="step-label">Impressions</div>
+                            <div class="step-value">245.2K</div>
+                            <div class="step-rate">
+                                <i class="fas fa-arrow-up rate-up"></i>
+                                <span>+12% WoW</span>
+                            </div>
+                        </div>
+                        
+                        <div class="funnel-step">
+                            <div class="step-circle">2</div>
+                            <div class="step-label">Landing Page</div>
+                            <div class="step-value">45.8K</div>
+                            <div class="step-rate">
+                                <i class="fas fa-arrow-down rate-down"></i>
+                                <span>18.7% CTR</span>
+                            </div>
+                        </div>
+                        
+                        <div class="funnel-step">
+                            <div class="step-circle">3</div>
+                            <div class="step-label">Wallet Connect</div>
+                            <div class="step-value">12.4K</div>
+                            <div class="step-rate">
+                                <i class="fas fa-arrow-up rate-up"></i>
+                                <span>27.1% Rate</span>
+                            </div>
+                        </div>
+                        
+                        <div class="funnel-step">
+                            <div class="step-circle">4</div>
+                            <div class="step-label">First TX</div>
+                            <div class="step-value">3.2K</div>
+                            <div class="step-rate">
+                                <i class="fas fa-arrow-down rate-down"></i>
+                                <span>25.8% Rate</span>
+                            </div>
+                        </div>
+                        
+                        <div class="funnel-step">
+                            <div class="step-circle">5</div>
+                            <div class="step-label">Activated Wallet</div>
+                            <div class="step-value">1.8K</div>
+                            <div class="step-rate">
+                                <i class="fas fa-arrow-up rate-up"></i>
+                                <span>56.3% Rate</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="funnel-metrics">
+                        <div class="funnel-metric">
+                            <div class="metric-label">
+                                <i class="fas fa-dollar-sign"></i>
+                                CPW by Channel
+                            </div>
+                            <div class="metric-value">$1.24</div>
+                            <div class="metric-detail">Twitch: $1.12 | Twitter: $1.45 | OpenSea: $0.00</div>
+                        </div>
+                        
+                        <div class="funnel-metric">
+                            <div class="metric-label">
+                                <i class="fas fa-clock"></i>
+                                Time-to-First-TX
+                            </div>
+                            <div class="metric-value">3:12</div>
+                            <div class="metric-detail">Avg. 3:12 | Median: 2:48 | 90th %ile: 5:36</div>
+                        </div>
+                        
+                        <div class="funnel-metric">
+                            <div class="metric-label">
+                                <i class="fas fa-wallet"></i>
+                                Wallet Quality Score
+                            </div>
+                            <div class="metric-value">68% A/B</div>
+                            <div class="metric-detail">Grade A: 42% | Grade B: 26% | Grade C: 32%</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Heatmap -->
+                <div class="card-header" style="margin-top: 40px;">
+                    <div class="card-title">
+                        <i class="fas fa-fire"></i>
+                        Drop-off Heatmap by Traffic Source
+                    </div>
+                </div>
+                
+                <div class="heatmap-container">
+                    <div class="heatmap-grid">
+                        <!-- Row 1: Sources -->
+                        <div class="heatmap-cell" style="background: transparent; border: none;"></div>
+                        <div class="heatmap-cell" style="background: transparent; border: none;">
+                            <div class="heatmap-label">Impressions → Landing</div>
+                        </div>
+                        <div class="heatmap-cell" style="background: transparent; border: none;">
+                            <div class="heatmap-label">Landing → Connect</div>
+                        </div>
+                        <div class="heatmap-cell" style="background: transparent; border: none;">
+                            <div class="heatmap-label">Connect → First TX</div>
+                        </div>
+                        <div class="heatmap-cell" style="background: transparent; border: none;">
+                            <div class="heatmap-label">First TX → Activated</div>
+                        </div>
+                        
+                        <!-- Row 2: Twitch -->
+                        <div class="heatmap-cell" style="background: rgba(100, 65, 164, 0.2);">
+                            <div class="heatmap-label"><i class="fab fa-twitch"></i> Twitch</div>
+                        </div>
+                        <div class="heatmap-cell" data-rate="60" onclick="showDetail('twitch', 'step1')">
+                            <div class="heatmap-value">60%</div>
+                            <div class="heatmap-rate rate-up">+5%</div>
+                        </div>
+                        <div class="heatmap-cell" data-rate="25" onclick="showDetail('twitch', 'step2')">
+                            <div class="heatmap-value">25%</div>
+                            <div class="heatmap-rate rate-up">+3%</div>
+                        </div>
+                        <div class="heatmap-cell" data-rate="18" onclick="showDetail('twitch', 'step3')">
+                            <div class="heatmap-value">18%</div>
+                            <div class="heatmap-rate rate-down">-2%</div>
+                        </div>
+                        <div class="heatmap-cell" data-rate="12" onclick="showDetail('twitch', 'step4')">
+                            <div class="heatmap-value">12%</div>
+                            <div class="heatmap-rate rate-up">+4%</div>
+                        </div>
+                        
+                        <!-- Row 3: Twitter -->
+                        <div class="heatmap-cell" style="background: rgba(29, 161, 242, 0.2);">
+                            <div class="heatmap-label"><i class="fab fa-twitter"></i> Twitter</div>
+                        </div>
+                        <div class="heatmap-cell" data-rate="45" onclick="showDetail('twitter', 'step1')">
+                            <div class="heatmap-value">45%</div>
+                            <div class="heatmap-rate rate-down">-8%</div>
+                        </div>
+                        <div class="heatmap-cell" data-rate="12" onclick="showDetail('twitter', 'step2')">
+                            <div class="heatmap-value">12%</div>
+                            <div class="heatmap-rate rate-down">-5%</div>
+                        </div>
+                        <div class="heatmap-cell" data-rate="8" onclick="showDetail('twitter', 'step3')">
+                            <div class="heatmap-value">8%</div>
+                            <div class="heatmap-rate rate-up">+1%</div>
+                        </div>
+                        <div class="heatmap-cell" data-rate="5" onclick="showDetail('twitter', 'step4')">
+                            <div class="heatmap-value">5%</div>
+                            <div class="heatmap-rate rate-down">-2%</div>
+                        </div>
+                        
+                        <!-- Row 4: OpenSea -->
+                        <div class="heatmap-cell" style="background: rgba(255, 107, 53, 0.2);">
+                            <div class="heatmap-label"><i class="fas fa-shopping-cart"></i> OpenSea</div>
+                        </div>
+                        <div class="heatmap-cell" data-rate="70" onclick="showDetail('opensea', 'step1')">
+                            <div class="heatmap-value">70%</div>
+                            <div class="heatmap-rate rate-up">+12%</div>
+                        </div>
+                        <div class="heatmap-cell" data-rate="40" onclick="showDetail('opensea', 'step2')">
+                            <div class="heatmap-value">40%</div>
+                            <div class="heatmap-rate rate-up">+8%</div>
+                        </div>
+                        <div class="heatmap-cell" data-rate="30" onclick="showDetail('opensea', 'step3')">
+                            <div class="heatmap-value">30%</div>
+                            <div class="heatmap-rate rate-up">+5%</div>
+                        </div>
+                        <div class="heatmap-cell" data-rate="22" onclick="showDetail('opensea', 'step4')">
+                            <div class="heatmap-value">22%</div>
+                            <div class="heatmap-rate rate-up">+6%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- TAB 2: COHORT RETENTION -->
+        <div id="tab-cohort" class="tab-content">
+            <div class="content-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-layer-group"></i>
+                        Cohort Retention Analysis
+                    </div>
+                    <div class="card-controls">
+                        <div class="filter-btn" onclick="changeCohortView('retention')">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Retention View</span>
+                        </div>
+                        <div class="filter-btn" onclick="changeCohortView('revenue')">
+                            <i class="fas fa-coins"></i>
+                            <span>Revenue View</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="cohort-table-container">
+                    <table class="cohort-table">
+                        <thead>
+                            <tr>
+                                <th>Cohort</th>
+                                <th>Size</th>
+                                <th>D1</th>
+                                <th>D3</th>
+                                <th>D7</th>
+                                <th>D14</th>
+                                <th>D30</th>
+                                <th>D60</th>
+                                <th>D90</th>
+                                <th>ARPPU</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="cohort-period">Apr 2025</td>
+                                <td>1,842</td>
+                                <td class="retention-cell" onclick="showCohortDetail('apr2025', 'd1')">
+                                    <div class="retention-value">82%</div>
+                                    <div class="retention-trend rate-up">+3%</div>
+                                </td>
+                                <td class="retention-cell" onclick="showCohortDetail('apr2025', 'd3')">
+                                    <div class="retention-value">65%</div>
+                                    <div class="retention-trend rate-up">+2%</div>
+                                </td>
+                                <td class="retention-cell" onclick="showCohortDetail('apr2025', 'd7')">
+                                    <div class="retention-value">48%</div>
+                                    <div class="retention-trend rate-up">+4%</div>
+                                </td>
+                                <td class="retention-cell" onclick="showCohortDetail('apr2025', 'd14')">
+                                    <div class="retention-value">35%</div>
+                                    <div class="retention-trend rate-up">+3%</div>
+                                </td>
+                                <td class="retention-cell" onclick="showCohortDetail('apr2025', 'd30')">
+                                    <div class="retention-value">28%</div>
+                                    <div class="retention-trend rate-up">+5%</div>
+                                </td>
+                                <td class="retention-cell" onclick="showCohortDetail('apr2025', 'd60')">
+                                    <div class="retention-value">22%</div>
+                                    <div class="retention-trend rate-up">+4%</div>
+                                </td>
+                                <td class="retention-cell" onclick="showCohortDetail('apr2025', 'd90')">
+                                    <div class="retention-value">18%</div>
+                                    <div class="retention-trend rate-up">+3%</div>
+                                </td>
+                                <td>$52</td>
+                            </tr>
+                            <tr>
+                                <td class="cohort-period">Mar 2025</td>
+                                <td>1,523</td>
+                                <td>78%</td>
+                                <td>62%</td>
+                                <td>45%</td>
+                                <td>32%</td>
+                                <td>24%</td>
+                                <td>19%</td>
+                                <td>15%</td>
+                                <td>$48</td>
+                            </tr>
+                            <tr>
+                                <td class="cohort-period">Feb 2025</td>
+                                <td>1,215</td>
+                                <td>75%</td>
+                                <td>58%</td>
+                                <td>42%</td>
+                                <td>30%</td>
+                                <td>22%</td>
+                                <td>18%</td>
+                                <td>14%</td>
+                                <td>$45</td>
+                            </tr>
+                            <tr>
+                                <td class="cohort-period">Jan 2025</td>
+                                <td>892</td>
+                                <td>72%</td>
+                                <td>54%</td>
+                                <td>38%</td>
+                                <td>27%</td>
+                                <td>20%</td>
+                                <td>16%</td>
+                                <td>12%</td>
+                                <td>$42</td>
+                            </tr>
+                            <tr>
+                                <td class="cohort-period">Dec 2024</td>
+                                <td>1,045</td>
+                                <td>70%</td>
+                                <td>52%</td>
+                                <td>36%</td>
+                                <td>25%</td>
+                                <td>18%</td>
+                                <td>14%</td>
+                                <td>11%</td>
+                                <td>$40</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Retention Curve -->
+                <div class="card-header" style="margin-top: 40px;">
+                    <div class="card-title">
+                        <i class="fas fa-chart-line"></i>
+                        Retention Curve by Segment
+                    </div>
+                </div>
+                
+                <div style="height: 400px; margin: 30px 0;">
+                    <canvas id="retentionChart"></canvas>
+                </div>
+                
+                <div class="funnel-metrics">
+                    <div class="funnel-metric">
+                        <div class="metric-label">
+                            <i class="fas fa-crosshairs"></i>
+                            D7 Retention Target
+                        </div>
+                        <div class="metric-value">48%</div>
+                        <div class="metric-detail">Target: 45% | Status: <span style="color: var(--accent-success);">Exceeding</span></div>
+                    </div>
+                    
+                    <div class="funnel-metric">
+                        <div class="metric-label">
+                            <i class="fas fa-user-friends"></i>
+                            Best Performing Cohort
+                        </div>
+                        <div class="metric-value">Apr 2025</div>
+                        <div class="metric-detail">D30: 28% (+5% vs Mar) | Source: Twitch Tournaments</div>
+                    </div>
+                    
+                    <div class="funnel-metric">
+                        <div class="metric-label">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Churn Risk Period
+                        </div>
+                        <div class="metric-value">Day 3-7</div>
+                        <div class="metric-detail">65% → 48% (-17pp) | Focus: Onboarding & Rewards</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- TAB 3: NETWORK EFFECTS -->
+        <div id="tab-network" class="tab-content">
+            <div class="content-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-project-diagram"></i>
+                        Network Effects & Community Health
+                    </div>
+                    <div class="card-controls">
+                        <div class="filter-btn" onclick="toggleNetworkView('graph')">
+                            <i class="fas fa-network-wired"></i>
+                            <span>Graph View</span>
+                        </div>
+                        <div class="filter-btn" onclick="toggleNetworkView('metrics')">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>Metrics View</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Network Graph Visualization -->
+                <div id="network-graph-view">
+                    <div class="network-graph-container">
+                        <div style="height: 100%; display: flex; align-items: center; justify-content: center; background-color: rgba(30, 30, 58, 0.3); border-radius: 12px; border: 2px dashed var(--card-border); padding: 40px;">
+                            <div style="text-align: center; max-width: 600px;">
+                                <div style="font-size: 48px; color: var(--primary-web3); margin-bottom: 20px;">
+                                    <i class="fas fa-project-diagram"></i>
+                                </div>
+                                <h3 style="font-size: 24px; margin-bottom: 15px;">Social Network Graph</h3>
+                                <p style="color: var(--text-secondary); margin-bottom: 25px;">
+                                    Visualizing 42 guilds and 3,842 connections between players. 
+                                    The largest cluster centers around <span class="highlight">"Immortals Guild"</span> with 285 members.
+                                </p>
+                                <div class="filter-btn" onclick="loadNetworkGraph()" style="display: inline-flex;">
+                                    <i class="fas fa-play"></i>
+                                    <span>Load Interactive Graph</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="graph-legend">
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: var(--primary-web3);"></div>
+                            <span>Guild Leaders</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: var(--secondary-esports);"></div>
+                            <span>Active Players</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: var(--accent-warning);"></div>
+                            <span>Content Creators</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: var(--accent-info);"></div>
+                            <span>Token Holders</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Network Metrics -->
+                <div class="funnel-metrics" style="margin-top: 40px;">
+                    <div class="funnel-metric">
+                        <div class="metric-label">
+                            <i class="fas fa-users"></i>
+                            Guild Health
+                        </div>
+                        <div class="metric-value">42</div>
+                        <div class="metric-detail">Active Guilds | Avg Size: 85 | Retention: 68%</div>
+                    </div>
+                    
+                    <div class="funnel-metric">
+                        <div class="metric-label">
+                            <i class="fas fa-virus"></i>
+                            Viral Coefficient
+                        </div>
+                        <div class="metric-value">K = 0.42</div>
+                        <div class="metric-detail">Invites: 5.2/user | Conversion: 18% | Cycle: 3.2d</div>
+                    </div>
+                    
+                    <div class="funnel-metric">
+                        <div class="metric-label">
+                            <i class="fas fa-paint-brush"></i>
+                            UGC Creation
+                        </div>
+                        <div class="metric-value">5.2%</div>
+                        <div class="metric-detail">of DAU | 1.2K NFTs created | 320 stream hours</div>
+                    </div>
+                </div>
+                
+                <!-- Top Guilds -->
+                <div class="card-header" style="margin-top: 40px;">
+                    <div class="card-title">
+                        <i class="fas fa-crown"></i>
+                        Top Performing Guilds
+                    </div>
+                </div>
+                
+                <div class="funnel-metrics">
+                    <div class="funnel-metric">
+                        <div class="metric-label">
+                            <i class="fas fa-trophy"></i>
+                            Immortals Guild
+                        </div>
+                        <div class="metric-value">285 members</div>
+                        <div class="metric-detail">D30 Retention: 78% | Invites: 312 | Revenue: $8.4K</div>
+                    </div>
+                    
+                    <div class="funnel-metric">
+                        <div class="metric-label">
+                            <i class="fas fa-chess-queen"></i>
+                            Crypto Crusaders
+                        </div>
+                        <div class="metric-value">192 members</div>
+                        <div class="metric-detail">D30 Retention: 65% | Invites: 185 | Revenue: $5.2K</div>
+                    </div>
+                    
+                    <div class="funnel-metric">
+                        <div class="metric-label">
+                            <i class="fas fa-shield-alt"></i>
+                            Web3 Warriors
+                        </div>
+                        <div class="metric-value">158 members</div>
+                        <div class="metric-detail">D30 Retention: 71% | Invites: 142 | Revenue: $4.8K</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- TAB 4: USER SEGMENTS -->
+        <div id="tab-segments" class="tab-content">
+            <div class="content-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-chart-pie"></i>
+                        User Segment Analysis
+                    </div>
+                    <div class="card-controls">
+                        <div class="filter-btn" onclick="changeSegmentView('overview')">
+                            <i class="fas fa-eye"></i>
+                            <span>Overview</span>
+                        </div>
+                        <div class="filter-btn" onclick="changeSegmentView('comparison')">
+                            <i class="fas fa-balance-scale"></i>
+                            <span>Compare Segments</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="segment-grid">
+                    <!-- Players -->
+                    <div class="segment-card segment-players">
+                        <div class="segment-header">
+                            <div class="segment-icon">
+                                <i class="fas fa-gamepad"></i>
+                            </div>
+                            <div class="segment-title">
+                                <h3>Players</h3>
+                                <p>Core gamers, tournament participants</p>
+                            </div>
+                        </div>
+                        <div class="segment-metrics">
+                            <div class="segment-metric">
+                                <div class="metric-label">% of DAU</div>
+                                <div class="metric-value">42%</div>
+                                <div class="metric-change rate-up">
+                                    <i class="fas fa-arrow-up"></i> +5%
+                                </div>
+                            </div>
+                            <div class="segment-metric">
+                                <div class="metric-label">D30 Retention</div>
+                                <div class="metric-value">35%</div>
+                                <div class="metric-change rate-up">
+                                    <i class="fas fa-arrow-up"></i> +3%
+                                </div>
+                            </div>
+                            <div class="segment-metric">
+                                <div class="metric-label">ARPPU</div>
+                                <div class="metric-value">$25</div>
+                                <div class="metric-change rate-up">
+                                    <i class="fas fa-arrow-up"></i> +12%
+                                </div>
+                            </div>
+                            <div class="segment-metric">
+                                <div class="metric-label">Stickiness</div>
+                                <div class="metric-value">42%</div>
+                                <div class="metric-change rate-up">
+                                    <i class="fas fa-arrow-up"></i> +4%
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Traders -->
+                    <div class="segment-card segment-traders">
+                        <div class="segment-header">
+                            <div class="segment-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="segment-title">
+                                <h3>Traders</h3>
+                                <p>NFT flippers, market participants</p>
+                            </div>
+                        </div>
+                        <div class="segment-metrics">
+                            <div class="segment-metric">
+                                <div class="metric-label">% of DAU</div>
+                                <div class="metric-value">18%</div>
+                                <div class="metric-change rate-down">
+                                    <i class="fas fa-arrow-down"></i> -2%
+                                </div>
+                            </div>
+                            <div class="segment-metric">
+                                <div class="metric-label">D30 Retention</div>
+                                <div class="metric-value">18%</div>
+                                <div class="metric-change rate-down">
+                                    <i class="fas fa-arrow-down"></i> -5%
+                                </div>
+                            </div>
+                            <div class="segment-metric">
+                                <div class="metric-label">ARPPU</div>
+                                <div class="metric-value">$420</div>
+                                <div class="metric-change rate-up">
+                                    <i class="fas fa-arrow-up"></i> +8%
+                                </div>
+                            </div>
+                            <div class="segment-metric">
+                                <div class="metric-label">Stickiness</div>
+                                <div class="metric-value">25%</div>
+                                <div class="metric-change rate-down">
+                                    <i class="fas fa-arrow-down"></i> -3%
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Collectors -->
+                    <div class="segment-card segment-collectors">
+                        <div class="segment-header">
+                            <div class="segment-icon">
+                                <i class="fas fa-gem"></i>
+                            </div>
+                            <div class="segment-title">
+                                <h3>Collectors</h3>
+                                <p>NFT collectors, rare item hunters</p>
+                            </div>
+                        </div>
+                        <div class="segment-metrics">
+                            <div class="segment-metric">
+                                <div class="metric-label">% of DAU</div>
+                                <div class="metric-value">15%</div>
+                                <div class="metric-change rate-neutral">
+                                    <i class="fas fa-minus"></i> 0%
+                                </div>
+                            </div>
+                            <div class="segment-metric">
+                                <div class="metric-label">D30 Retention</div>
+                                <div class="metric-value">55%</div>
+                                <div class="metric-change rate-up">
+                                    <i class="fas fa-arrow-up"></i> +8%
+                                </div>
+                            </div>
+                            <div class="segment-metric">
+                                <div class="metric-label">ARPPU</div>
+                                <div class="metric-value">$1,200</div>
+                                <div class="metric-change rate-up">
+                                    <i class="fas fa-arrow-up"></i> +5%
+                                </div>
+                            </div>
+                            <div class="segment-metric">
+                                <div class="metric-label">Stickiness</div>
+                                <div class="metric-value">15%</div>
+                                <div class="metric-change rate-down">
+                                    <i class="fas fa-arrow-down"></i> -2%
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- DeFi Users -->
+                    <div class="segment-card segment-defi">
+                        <div class="segment-header">
+                            <div class="segment-icon">
+                                <i class="fas fa-coins"></i>
+                            </div>
+                            <div class="segment-title">
+                                <h3>DeFi Users</h3>
+                                <p>Stakers, liquidity providers</p>
+                            </div>
+                        </div>
+                        <div class="segment-metrics">
+                            <div class="segment-metric">
+                                <div class="metric-label">% of DAU</div>
+                                <div class="metric-value">25%</div>
+                                <div class="metric-change rate-up">
+                                    <i class="fas fa-arrow-up"></i> +8%
+                                </div>
+                            </div>
+                            <div class="segment-metric">
+                                <div class="metric-label">D30 Retention</div>
+                                <div class="metric-value">42%</div>
+                                <div class="metric-change rate-up">
+                                    <i class="fas fa-arrow-up"></i> +12%
+                                </div>
+                            </div>
+                            <div class="segment-metric">
+                                <div class="metric-label">ARPPU</div>
+                                <div class="metric-value">$150</div>
+                                <div class="metric-change rate-up">
+                                    <i class="fas fa-arrow-up"></i> +15%
+                                </div>
+                            </div>
+                            <div class="segment-metric">
+                                <div class="metric-label">Stickiness</div>
+                                <div class="metric-value">60%</div>
+                                <div class="metric-change rate-up">
+                                    <i class="fas fa-arrow-up"></i> +10%
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Segment Composition -->
+                <div class="card-header" style="margin-top: 40px;">
+                    <div class="card-title">
+                        <i class="fas fa-chart-bar"></i>
+                        Segment Composition & Value
+                    </div>
+                </div>
+                
+                <div style="height: 300px; margin: 30px 0;">
+                    <canvas id="segmentChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- FOOTER -->
+        <div class="footer">
+            <div class="insight-box">
+                <div class="insight-title">
+                    <i class="fas fa-lightbulb"></i>
+                    KEY INSIGHT FROM DATA
+                </div>
+                <div class="insight-text">
+                    <span class="highlight">OpenSea referrals</span> có conversion rate cao nhất (22% activated wallets) 
+                    nhưng <span class="highlight">Twitch streams</span> mang lại retention tốt nhất (D30: 35% cho Players). 
+                    Cần tối ưu onboarding cho Traders segment - đang có retention thấp nhất (18%).
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Biểu đồ Retention Curve
+        let retentionChart;
+        
+        // Biểu đồ Segment
+        let segmentChart;
+        
+        // Khởi tạo biểu đồ
+        function initCharts() {
+            // Retention Chart
+            const retentionCtx = document.getElementById('retentionChart').getContext('2d');
+            retentionChart = new Chart(retentionCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Day 1', 'Day 3', 'Day 7', 'Day 14', 'Day 30', 'Day 60', 'Day 90'],
+                    datasets: [
+                        {
+                            label: 'Players',
+                            data: [82, 65, 48, 35, 28, 22, 18],
+                            borderColor: '#00ff88',
+                            backgroundColor: 'rgba(0, 255, 136, 0.1)',
+                            borderWidth: 3,
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: 'Traders',
+                            data: [78, 52, 28, 18, 12, 8, 6],
+                            borderColor: '#8a2be2',
+                            backgroundColor: 'rgba(138, 43, 226, 0.1)',
+                            borderWidth: 3,
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: 'Collectors',
+                            data: [85, 72, 60, 55, 50, 48, 45],
+                            borderColor: '#ffaa00',
+                            backgroundColor: 'rgba(255, 170, 0, 0.1)',
+                            borderWidth: 3,
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: 'DeFi Users',
+                            data: [80, 65, 55, 48, 42, 38, 35],
+                            borderColor: '#2b9be2',
+                            backgroundColor: 'rgba(43, 155, 226, 0.1)',
+                            borderWidth: 3,
+                            tension: 0.4,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                color: '#8b8ba7',
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(26, 26, 46, 0.9)',
+                            titleColor: '#ffffff',
+                            bodyColor: '#ffffff',
+                            borderColor: '#8a2be2',
+                            borderWidth: 1
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.05)'
+                            },
+                            ticks: {
+                                color: '#8b8ba7',
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.05)'
+                            },
+                            ticks: {
+                                color: '#8b8ba7'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Segment Chart
+            const segmentCtx = document.getElementById('segmentChart').getContext('2d');
+            segmentChart = new Chart(segmentCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Players', 'Traders', 'Collectors', 'DeFi Users'],
+                    datasets: [
+                        {
+                            label: '% of DAU',
+                            data: [42, 18, 15, 25],
+                            backgroundColor: 'rgba(138, 43, 226, 0.7)',
+                            borderColor: '#8a2be2',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'D30 Retention %',
+                            data: [35, 18, 55, 42],
+                            backgroundColor: 'rgba(0, 255, 136, 0.7)',
+                            borderColor: '#00ff88',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'ARPPU ($)',
+                            data: [25, 420, 1200, 150],
+                            backgroundColor: 'rgba(255, 170, 0, 0.7)',
+                            borderColor: '#ffaa00',
+                            borderWidth: 1,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                color: '#8b8ba7',
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.05)'
+                            },
+                            ticks: {
+                                color: '#8b8ba7',
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            grid: {
+                                drawOnChartArea: false,
+                            },
+                            ticks: {
+                                color: '#8b8ba7',
+                                callback: function(value) {
+                                    return '$' + value;
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.05)'
+                            },
+                            ticks: {
+                                color: '#8b8ba7'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Tab switching
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+            
+            // Update charts if needed
+            if (tabName === 'cohort' && !retentionChart) {
+                setTimeout(initCharts, 100);
+            }
+            if (tabName === 'segments' && !segmentChart) {
+                setTimeout(initCharts, 100);
+            }
+        }
+        
+        // Filter by source
+        function filterBySource(source) {
+            const heatmapCells = document.querySelectorAll('.heatmap-cell[data-rate]');
+            
+            if (source === 'web3') {
+                // Highlight Web3 sources
+                document.querySelectorAll('.heatmap-cell').forEach(cell => {
+                    if (cell.textContent.includes('Twitch') || cell.textContent.includes('Twitter')) {
+                        cell.style.opacity = '0.3';
+                    } else if (cell.textContent.includes('OpenSea')) {
+                        cell.style.opacity = '1';
+                        cell.style.boxShadow = '0 0 20px rgba(255, 107, 53, 0.3)';
+                    }
+                });
+                
+                // Update funnel metrics for Web3 only
+                document.querySelector('.funnel-step:nth-child(1) .step-value').textContent = '85.4K';
+                document.querySelector('.funnel-step:nth-child(2) .step-value').textContent = '59.8K';
+                document.querySelector('.funnel-step:nth-child(3) .step-value').textContent = '23.9K';
+                document.querySelector('.funnel-step:nth-child(4) .step-value').textContent = '7.2K';
+                document.querySelector('.funnel-step:nth-child(5) .step-value').textContent = '4.0K';
+                
+                showAlert('Đang xem dữ liệu Web3 sources only (OpenSea, Magic Eden, etc.)');
+            } else {
+                // Reset to all sources
+                document.querySelectorAll('.heatmap-cell').forEach(cell => {
+                    cell.style.opacity = '1';
+                    cell.style.boxShadow = 'none';
+                });
+                
+                // Reset funnel metrics
+                document.querySelector('.funnel-step:nth-child(1) .step-value').textContent = '245.2K';
+                document.querySelector('.funnel-step:nth-child(2) .step-value').textContent = '45.8K';
+                document.querySelector('.funnel-step:nth-child(3) .step-value').textContent = '12.4K';
+                document.querySelector('.funnel-step:nth-child(4) .step-value').textContent = '3.2K';
+                document.querySelector('.funnel-step:nth-child(5) .step-value').textContent = '1.8K';
+                
+                showAlert('Đang xem tất cả traffic sources');
+            }
+        }
+        
+        // Show detail for heatmap cell
+        function showDetail(source, step) {
+            const stepNames = {
+                'step1': 'Impressions → Landing Page',
+                'step2': 'Landing Page → Wallet Connect',
+                'step3': 'Wallet Connect → First TX',
+                'step4': 'First TX → Activated Wallet'
+            };
+            
+            const sourceNames = {
+                'twitch': 'Twitch Streams',
+                'twitter': 'Twitter/X',
+                'opensea': 'OpenSea Marketplace'
+            };
+            
+            alert(`Chi tiết conversion:\n\nSource: ${sourceNames[source]}\nStep: ${stepNames[step]}\n\nRecommendation: ${getRecommendation(source, step)}`);
+        }
+        
+        function getRecommendation(source, step) {
+            if (source === 'twitter' && step === 'step1') {
+                return "CTR thấp (45%). Cần optimize ad creative và targeting.";
+            } else if (source === 'twitch' && step === 'step3') {
+                return "Drop-off cao ở Wallet Connect → First TX. Cần simplify onboarding.";
+            } else if (source === 'opensea') {
+                return "Performance tốt. Có thể scale budget thêm.";
+            }
+            return "Performance trong expected range.";
+        }
+        
+        // Cohort detail
+        function showCohortDetail(cohort, day) {
+            alert(`Chi tiết cohort ${cohort.toUpperCase()} - ${day.toUpperCase()}:\n\n• Retention: Xem chi tiết trong cohort table\n• Activity: High engagement với tournaments\n• Revenue: $52 ARPPU\n• Source: 65% từ Twitch, 25% từ OpenSea`);
+        }
+        
+        // Change cohort view
+        function changeCohortView(view) {
+            if (view === 'revenue') {
+                // Switch to revenue view
+                document.querySelectorAll('.cohort-table th').forEach((th, index) => {
+                    if (index >= 2 && index <= 8) {
+                        th.textContent = th.textContent.replace('D', 'Rev D');
+                    }
+                });
+                
+                document.querySelectorAll('.cohort-table td').forEach((td, index) => {
+                    if (index % 10 >= 2 && index % 10 <= 8) {
+                        const current = parseInt(td.textContent);
+                        td.textContent = '$' + Math.round(current * 1.5 * (9 - (index % 10)));
+                    }
+                });
+                
+                showAlert('Đã chuyển sang Revenue view (USD per retained user)');
+            } else {
+                // Switch back to retention view
+                document.querySelectorAll('.cohort-table th').forEach((th, index) => {
+                    if (index >= 2 && index <= 8) {
+                        th.textContent = th.textContent.replace('Rev D', 'D');
+                    }
+                });
+                
+                // Reset to retention percentages
+                const retentionData = [
+                    [82, 65, 48, 35, 28, 22, 18],
+                    [78, 62, 45, 32, 24, 19, 15],
+                    [75, 58, 42, 30, 22, 18, 14],
+                    [72, 54, 38, 27, 20, 16, 12],
+                    [70, 52, 36, 25, 18, 14, 11]
+                ];
+                
+                let rowIndex = 0;
+                document.querySelectorAll('.cohort-table td').forEach((td, index) => {
+                    if (index % 10 >= 2 && index % 10 <= 8) {
+                        td.textContent = retentionData[rowIndex][(index % 10) - 2] + '%';
+                        if (index % 10 === 8) rowIndex++;
+                    }
+                });
+                
+                showAlert('Đã chuyển về Retention view (% users retained)');
+            }
+        }
+        
+        // Network graph
+        function loadNetworkGraph() {
+            document.getElementById('network-graph-view').innerHTML = `
+                <div style="height: 500px; display: flex; align-items: center; justify-content: center; background-color: rgba(30, 30, 58, 0.5); border-radius: 12px; position: relative;">
+                    <canvas id="networkCanvas" width="800" height="500"></canvas>
+                    <div style="position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.7); padding: 10px; border-radius: 8px;">
+                        <div style="color: var(--text-secondary); font-size: 12px;">Nodes: 428 | Edges: 3,842</div>
+                        <div style="color: var(--text-secondary); font-size: 12px;">Largest Cluster: 285 nodes</div>
+                    </div>
+                </div>
+            `;
+            
+            // Simulate drawing network graph
+            setTimeout(() => {
+                const canvas = document.getElementById('networkCanvas');
+                const ctx = canvas.getContext('2d');
+                
+                // Clear canvas
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw some random nodes and edges for demo
+                const nodes = [];
+                const edges = [];
+                
+                // Create nodes
+                for (let i = 0; i < 50; i++) {
+                    nodes.push({
+                        x: Math.random() * canvas.width,
+                        y: Math.random() * canvas.height,
+                        size: 3 + Math.random() * 4,
+                        type: Math.floor(Math.random() * 4)
+                    });
+                }
+                
+                // Create edges (connections)
+                for (let i = 0; i < 100; i++) {
+                    edges.push({
+                        from: Math.floor(Math.random() * nodes.length),
+                        to: Math.floor(Math.random() * nodes.length)
+                    });
+                }
+                
+                // Draw edges
+                ctx.strokeStyle = 'rgba(138, 43, 226, 0.2)';
+                ctx.lineWidth = 1;
+                
+                edges.forEach(edge => {
+                    const from = nodes[edge.from];
+                    const to = nodes[edge.to];
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(from.x, from.y);
+                    ctx.lineTo(to.x, to.y);
+                    ctx.stroke();
+                });
+                
+                // Draw nodes
+                const colors = ['#8a2be2', '#00ff88', '#ffaa00', '#2b9be2'];
+                
+                nodes.forEach(node => {
+                    ctx.fillStyle = colors[node.type];
+                    ctx.beginPath();
+                    ctx.arc(node.x, node.y, node.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                    ctx.stroke();
+                });
+                
+                // Draw center cluster (Immortals Guild)
+                ctx.fillStyle = 'rgba(0, 255, 136, 0.6)';
+                ctx.beginPath();
+                ctx.arc(canvas.width/2, canvas.height/2, 60, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Add label
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 14px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('Immortals Guild', canvas.width/2, canvas.height/2 - 70);
+                
+            }, 500);
+        }
+        
+        function toggleNetworkView(view) {
+            if (view === 'metrics') {
+                // Show metrics view
+                document.querySelector('#network-graph-view').style.display = 'none';
+                document.querySelector('.funnel-metrics').style.display = 'grid';
+                showAlert('Đang hiển thị Network Metrics');
+            } else {
+                // Show graph view
+                document.querySelector('#network-graph-view').style.display = 'block';
+                document.querySelector('.funnel-metrics').style.display = 'none';
+                showAlert('Đang hiển thị Network Graph');
+            }
+        }
+        
+        // Segment view
+        function changeSegmentView(view) {
+            if (view === 'comparison') {
+                // Highlight differences
+                document.querySelectorAll('.segment-card').forEach(card => {
+                    const retention = card.querySelector('.segment-metric:nth-child(2) .metric-value').textContent;
+                    const arppu = card.querySelector('.segment-metric:nth-child(3) .metric-value').textContent;
+                    
+                    if (parseInt(retention) < 20) {
+                        card.style.borderColor = 'var(--accent-danger)';
+                        card.style.boxShadow = '0 8px 25px rgba(255, 68, 102, 0.2)';
+                    } else if (parseInt(retention) > 40) {
+                        card.style.borderColor = 'var(--accent-success)';
+                        card.style.boxShadow = '0 8px 25px rgba(0, 255, 136, 0.2)';
+                    }
+                });
+                
+                showAlert('Đang highlight segments based on retention performance');
+            } else {
+                // Reset to normal view
+                document.querySelectorAll('.segment-card').forEach(card => {
+                    card.style.borderColor = 'var(--card-border)';
+                    card.style.boxShadow = 'none';
+                });
+                showAlert('Đang hiển thị segment overview');
+            }
+        }
+        
+        // Export data
+        function exportData() {
+            alert('Đang xuất dữ liệu ra CSV file...\n\nFile: ASSA_DeepDive_Analytics_2025-04-22.csv\n\nCheck your downloads folder.');
+        }
+        
+        // Show alert
+        function showAlert(message) {
+            // Create alert element
+            const alertDiv = document.createElement('div');
+            alertDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background-color: var(--card-bg);
+                color: var(--text-primary);
+                padding: 15px 20px;
+                border-radius: 10px;
+                border-left: 4px solid var(--primary-web3);
+                box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+                z-index: 1000;
+                max-width: 400px;
+                animation: slideIn 0.3s;
+            `;
+            
+            alertDiv.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-info-circle" style="color: var(--primary-web3);"></i>
+                    <div>${message}</div>
+                </div>
+            `;
+            
+            document.body.appendChild(alertDiv);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                alertDiv.style.animation = 'slideOut 0.3s';
+                setTimeout(() => {
+                    document.body.removeChild(alertDiv);
+                }, 300);
+            }, 3000);
+        }
+        
+        // Add CSS for animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initCharts();
+            
+            // Add heatmap cell interactivity
+            document.querySelectorAll('.heatmap-cell[data-rate]').forEach(cell => {
+                const rate = parseInt(cell.getAttribute('data-rate'));
+                let color;
+                
+                if (rate >= 50) {
+                    color = 'rgba(0, 255, 136, 0.3)';
+                } else if (rate >= 30) {
+                    color = 'rgba(255, 170, 0, 0.3)';
+                } else {
+                    color = 'rgba(255, 68, 102, 0.3)';
+                }
+                
+                cell.style.backgroundColor = color;
+            });
+        });
+    </script>
+</body>
+</html>
