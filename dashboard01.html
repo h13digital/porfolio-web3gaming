@@ -1,0 +1,1940 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marketing Performance Dashboard | ASSA</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-web3: #8a2be2;
+            --secondary-esports: #00ff88;
+            --accent-danger: #ff4466;
+            --accent-warning: #ffaa00;
+            --accent-success: #00ff88;
+            --accent-info: #2b9be2;
+            --marketing-bg: #0f0f1a;
+            --card-bg: #1a1a2e;
+            --card-border: #2d2d4a;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0c0;
+            --text-muted: #6a6a8a;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --shadow-hover: 0 12px 48px rgba(0, 0, 0, 0.4);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Inter', -apple-system, sans-serif;
+        }
+        
+        body {
+            background-color: var(--marketing-bg);
+            color: var(--text-primary);
+            padding: 20px;
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(138, 43, 226, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(0, 255, 136, 0.05) 0%, transparent 20%);
+        }
+        
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+        
+        /* GLOBAL NAVIGATION BAR */
+        .global-navigation {
+            background-color: rgba(10, 10, 21, 0.98);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--card-border);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 0;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .nav-container {
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            height: 60px;
+        }
+        
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-right: 40px;
+        }
+        
+        .nav-logo {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--primary-web3), var(--secondary-esports));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: white;
+        }
+        
+        .nav-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            white-space: nowrap;
+        }
+        
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            flex: 1;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .nav-item:hover {
+            background-color: rgba(138, 43, 226, 0.1);
+            color: var(--primary-web3);
+        }
+        
+        .nav-item.active {
+            background-color: rgba(138, 43, 226, 0.2);
+            color: var(--primary-web3);
+            font-weight: 600;
+        }
+        
+        .nav-item i {
+            font-size: 16px;
+        }
+        
+        .nav-divider {
+            width: 1px;
+            height: 24px;
+            background-color: var(--card-border);
+            margin: 0 16px;
+        }
+        
+        .nav-actions {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .user-profile:hover {
+            background-color: rgba(138, 43, 226, 0.1);
+        }
+        
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--primary-web3), var(--secondary-esports));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+        }
+        
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .user-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .user-role {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .nav-notification {
+            position: relative;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 18px;
+        }
+        
+        .nav-notification:hover {
+            background-color: rgba(138, 43, 226, 0.1);
+            color: var(--primary-web3);
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background-color: var(--accent-danger);
+            color: white;
+            font-size: 10px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        /* NOTIFICATION PANEL */
+        .notification-panel {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+            box-shadow: var(--shadow-hover);
+            width: 350px;
+            z-index: 999;
+            display: none;
+            overflow: hidden;
+        }
+        
+        .notification-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--card-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .notification-title {
+            font-size: 16px;
+            font-weight: 700;
+        }
+        
+        .notification-clear {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 12px;
+            cursor: pointer;
+        }
+        
+        .notification-clear:hover {
+            color: var(--primary-web3);
+        }
+        
+        .notification-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .notification-item {
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .notification-item:hover {
+            background-color: rgba(138, 43, 226, 0.05);
+        }
+        
+        .notification-item.unread {
+            background-color: rgba(138, 43, 226, 0.1);
+        }
+        
+        .notification-message {
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+        
+        .notification-time {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        
+        /* HEADER */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--card-border);
+            margin-top: 80px; /* Compensate for fixed nav */
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo-icon {
+            background: linear-gradient(135deg, var(--primary-web3), var(--secondary-esports));
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: bold;
+            box-shadow: 0 4px 20px rgba(138, 43, 226, 0.4);
+        }
+        
+        .logo-text h1 {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(to right, var(--text-primary), var(--secondary-esports));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -0.5px;
+        }
+        
+        .logo-text p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .marketing-badge {
+            background-color: rgba(0, 255, 136, 0.2);
+            color: var(--secondary-esports);
+            font-size: 10px;
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+        
+        /* TIME FILTERS */
+        .time-filters {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .filter-group {
+            display: flex;
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 4px;
+            border: 1px solid var(--card-border);
+        }
+        
+        .filter-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .filter-btn.active {
+            background-color: rgba(138, 43, 226, 0.2);
+            color: var(--primary-web3);
+            font-weight: 600;
+        }
+        
+        .date-display {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-secondary);
+            font-size: 14px;
+            background-color: var(--card-bg);
+            padding: 10px 16px;
+            border-radius: 10px;
+            border: 1px solid var(--card-border);
+        }
+        
+        /* KPI CARDS */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        @media (max-width: 1400px) {
+            .kpi-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .kpi-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .kpi-card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid var(--card-border);
+            box-shadow: var(--shadow);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .kpi-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+        }
+        
+        .kpi-card.roi::before {
+            background: linear-gradient(to right, #00ff88, #00cc6a);
+        }
+        
+        .kpi-card.spend::before {
+            background: linear-gradient(to right, #8a2be2, #6a3dc9);
+        }
+        
+        .kpi-card.cac::before {
+            background: linear-gradient(to right, #2b9be2, #1a8bc9);
+        }
+        
+        .kpi-card.revenue::before {
+            background: linear-gradient(to right, #ffaa00, #ff8800);
+        }
+        
+        .kpi-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+        
+        .kpi-title {
+            font-size: 14px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+        
+        .kpi-trend {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
+        
+        .trend-up {
+            color: var(--accent-success);
+            background-color: rgba(0, 255, 136, 0.1);
+        }
+        
+        .trend-down {
+            color: var(--accent-danger);
+            background-color: rgba(255, 68, 102, 0.1);
+        }
+        
+        .kpi-value {
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            letter-spacing: -1px;
+        }
+        
+        .kpi-target {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+        
+        /* CHANNEL PERFORMANCE */
+        .channel-performance {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 30px;
+            border: 1px solid var(--card-border);
+            box-shadow: var(--shadow);
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .section-title i {
+            color: var(--primary-web3);
+        }
+        
+        .section-controls {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .control-btn {
+            background-color: rgba(30, 30, 58, 0.5);
+            border: 1px solid var(--card-border);
+            color: var(--text-secondary);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+        
+        .control-btn:hover {
+            background-color: rgba(138, 43, 226, 0.1);
+            color: var(--primary-web3);
+        }
+        
+        /* CHANNEL TABLE */
+        .channel-table-container {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+        }
+        
+        .channel-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1200px;
+        }
+        
+        .channel-table th {
+            background-color: rgba(30, 30, 58, 0.8);
+            padding: 18px;
+            text-align: center;
+            font-weight: 700;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--card-border);
+            position: sticky;
+            top: 0;
+        }
+        
+        .channel-table td {
+            padding: 18px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .channel-name {
+            text-align: left;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .channel-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        
+        .twitch-icon {
+            background-color: rgba(100, 65, 164, 0.2);
+            color: #9146ff;
+        }
+        
+        .twitter-icon {
+            background-color: rgba(29, 161, 242, 0.2);
+            color: #1da1f2;
+        }
+        
+        .opensea-icon {
+            background-color: rgba(255, 107, 53, 0.2);
+            color: #ff6b35;
+        }
+        
+        .discord-icon {
+            background-color: rgba(88, 101, 242, 0.2);
+            color: #5865f2;
+        }
+        
+        .youtube-icon {
+            background-color: rgba(255, 0, 0, 0.2);
+            color: #ff0000;
+        }
+        
+        .metric-cell {
+            font-weight: 600;
+        }
+        
+        .good-metric {
+            color: var(--accent-success);
+        }
+        
+        .warning-metric {
+            color: var(--accent-warning);
+        }
+        
+        .bad-metric {
+            color: var(--accent-danger);
+        }
+        
+        /* CHANNEL CHART */
+        .channel-chart-container {
+            height: 400px;
+            margin-top: 40px;
+        }
+        
+        /* DAILY TREND */
+        .daily-trend {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 30px;
+            border: 1px solid var(--card-border);
+            box-shadow: var(--shadow);
+        }
+        
+        .trend-chart-container {
+            height: 300px;
+            margin-top: 20px;
+        }
+        
+        /* BUDGET ALLOCATION */
+        .budget-allocation {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        @media (max-width: 1200px) {
+            .budget-allocation {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .budget-card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid var(--card-border);
+            box-shadow: var(--shadow);
+        }
+        
+        .budget-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .budget-item {
+            background-color: rgba(30, 30, 58, 0.5);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--card-border);
+        }
+        
+        .budget-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .budget-value {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+        
+        .budget-change {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        /* RECOMMENDATIONS */
+        .recommendations {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid var(--card-border);
+            box-shadow: var(--shadow);
+        }
+        
+        .rec-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        @media (max-width: 1200px) {
+            .rec-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .rec-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .rec-card {
+            background-color: rgba(30, 30, 58, 0.5);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--card-border);
+            transition: all 0.3s;
+        }
+        
+        .rec-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary-web3);
+        }
+        
+        .rec-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .rec-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        
+        .rec-icon.increase {
+            background-color: rgba(0, 255, 136, 0.1);
+            color: var(--accent-success);
+        }
+        
+        .rec-icon.decrease {
+            background-color: rgba(255, 170, 0, 0.1);
+            color: var(--accent-warning);
+        }
+        
+        .rec-icon.optimize {
+            background-color: rgba(138, 43, 226, 0.1);
+            color: var(--primary-web3);
+        }
+        
+        .rec-title {
+            font-size: 16px;
+            font-weight: 700;
+        }
+        
+        .rec-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        
+        /* FOOTER */
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid var(--card-border);
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+        
+        .dashboard-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 15px;
+        }
+        
+        .dashboard-link {
+            background-color: var(--card-bg);
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid var(--card-border);
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+        
+        .dashboard-link:hover {
+            background-color: rgba(138, 43, 226, 0.1);
+            color: var(--primary-web3);
+            border-color: var(--primary-web3);
+        }
+        
+        .dashboard-link.active {
+            background-color: rgba(138, 43, 226, 0.2);
+            color: var(--primary-web3);
+            border-color: var(--primary-web3);
+        }
+        
+        /* RESPONSIVE */
+        @media (max-width: 992px) {
+            .nav-menu span {
+                display: none;
+            }
+            
+            .nav-item {
+                padding: 12px;
+            }
+            
+            .nav-title {
+                display: none;
+            }
+            
+            .user-info {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 20px;
+                align-items: flex-start;
+            }
+            
+            .time-filters {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .notification-panel {
+                width: calc(100% - 40px);
+                right: 10px;
+            }
+        }
+        
+        /* ANIMATIONS */
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <!-- GLOBAL NAVIGATION BAR -->
+    <nav class="global-navigation">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <div class="nav-logo">
+                    <i class="fas fa-cube"></i>
+                </div>
+                <span class="nav-title">Marketing Dashboard Suite</span>
+            </div>
+            
+            <div class="nav-menu">
+                <a href="index.html" class="nav-item">
+                    <i class="fas fa-home"></i>
+                    <span>Overview</span>
+                </a>
+                <a href="dashboard01.html" class="nav-item active">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Performance</span>
+                </a>
+                <a href="dashboard02.html" class="nav-item">
+                    <i class="fas fa-sitemap"></i>
+                    <span>Attribution</span>
+                </a>
+                <a href="dashboard03.html" class="nav-item">
+                    <i class="fas fa-filter"></i>
+                    <span>Funnel</span>
+                </a>
+                <div class="nav-divider"></div>
+                <a href="../dashboard1.html" class="nav-item">
+                    <i class="fas fa-command"></i>
+                    <span>Command Center</span>
+                </a>
+            </div>
+            
+            <div class="nav-actions">
+                <button class="nav-notification" id="notification-btn">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">3</span>
+                </button>
+                <div class="user-profile">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-info">
+                        <span class="user-name">HIEP NGUYEN</span>
+                        <span class="user-role">Marketing Architect</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- NOTIFICATION PANEL -->
+    <div class="notification-panel" id="notification-panel">
+        <div class="notification-header">
+            <div class="notification-title">Notifications</div>
+            <button class="notification-clear" id="clear-notifications">Clear All</button>
+        </div>
+        <div class="notification-list" id="notification-list">
+            <div class="notification-item unread">
+                <div class="notification-message">
+                    <strong>Twitch ROAS</strong> increased by 18% this week
+                </div>
+                <div class="notification-time">10 minutes ago</div>
+            </div>
+            <div class="notification-item unread">
+                <div class="notification-message">
+                    <strong>OpenSea conversion rate</strong> dropped by 5%
+                </div>
+                <div class="notification-time">1 hour ago</div>
+            </div>
+            <div class="notification-item">
+                <div class="notification-message">
+                    <strong>Budget reallocation</strong> recommended for Twitter
+                </div>
+                <div class="notification-time">3 hours ago</div>
+            </div>
+            <div class="notification-item">
+                <div class="notification-message">
+                    Weekly attribution report is ready
+                </div>
+                <div class="notification-time">Yesterday</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">M</div>
+                <div class="logo-text">
+                    <h1>Marketing Performance Dashboard</h1>
+                    <p>Daily Marketing Intelligence <span class="marketing-badge">REAL-TIME</span></p>
+                </div>
+            </div>
+            
+            <div class="time-filters">
+                <div class="filter-group">
+                    <button class="filter-btn active" onclick="changeTimeRange('today')">Hôm nay</button>
+                    <button class="filter-btn" onclick="changeTimeRange('week')">7 ngày</button>
+                    <button class="filter-btn" onclick="changeTimeRange('month')">30 ngày</button>
+                </div>
+                <div class="date-display">
+                    <i class="far fa-calendar"></i>
+                    <span id="current-date">23/04/2025</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- KPI CARDS -->
+        <div class="kpi-grid">
+            <!-- Marketing ROI -->
+            <div class="kpi-card roi">
+                <div class="kpi-header">
+                    <div class="kpi-title">Marketing ROI</div>
+                    <div class="kpi-trend trend-up">
+                        <i class="fas fa-arrow-up"></i> 18%
+                    </div>
+                </div>
+                <div class="kpi-value">3.8x</div>
+                <div class="kpi-target">Target: > 3.0x | Revenue: $142K</div>
+            </div>
+            
+            <!-- Marketing Spend -->
+            <div class="kpi-card spend">
+                <div class="kpi-header">
+                    <div class="kpi-title">Marketing Spend</div>
+                    <div class="kpi-trend trend-up">
+                        <i class="fas fa-arrow-up"></i> 12%
+                    </div>
+                </div>
+                <div class="kpi-value">$37.4K</div>
+                <div class="kpi-target">Budget: $40K | Remaining: $2.6K</div>
+            </div>
+            
+            <!-- CAC -->
+            <div class="kpi-card cac">
+                <div class="kpi-header">
+                    <div class="kpi-title">Customer Acquisition Cost</div>
+                    <div class="kpi-trend trend-down">
+                        <i class="fas fa-arrow-down"></i> 8%
+                    </div>
+                </div>
+                <div class="kpi-value">$3.40</div>
+                <div class="kpi-target">Target: < $4.00 | LTV/CAC: 13.2x</div>
+            </div>
+            
+            <!-- Marketing Contribution -->
+            <div class="kpi-card revenue">
+                <div class="kpi-header">
+                    <div class="kpi-title">Marketing Contribution</div>
+                    <div class="kpi-trend trend-up">
+                        <i class="fas fa-arrow-up"></i> 5%
+                    </div>
+                </div>
+                <div class="kpi-value">68%</div>
+                <div class="kpi-target">% Revenue from marketing channels</div>
+            </div>
+        </div>
+        
+        <!-- CHANNEL PERFORMANCE -->
+        <div class="channel-performance">
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fas fa-chart-line"></i>
+                    Channel Performance Analysis
+                </div>
+                <div class="section-controls">
+                    <button class="control-btn" onclick="sortByMetric('roas')">
+                        <i class="fas fa-sort-amount-down"></i>
+                        Sort by ROAS
+                    </button>
+                    <button class="control-btn" onclick="exportChannelData()">
+                        <i class="fas fa-download"></i>
+                        Export
+                    </button>
+                </div>
+            </div>
+            
+            <div class="channel-table-container">
+                <table class="channel-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 200px;">Channel</th>
+                            <th>Spend</th>
+                            <th>Revenue</th>
+                            <th>ROAS</th>
+                            <th>CPW</th>
+                            <th>CAC</th>
+                            <th>D7 Retention</th>
+                            <th>ARPU</th>
+                            <th>Viral Coef</th>
+                            <th>Quality Score</th>
+                        </tr>
+                    </thead>
+                    <tbody id="channel-table-body">
+                        <!-- Data will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="channel-chart-container">
+                <canvas id="channelChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="budget-allocation">
+            <!-- DAILY TREND -->
+            <div class="budget-card">
+                <div class="section-header">
+                    <div class="section-title">
+                        <i class="fas fa-chart-bar"></i>
+                        Daily Performance Trend
+                    </div>
+                </div>
+                <div class="trend-chart-container">
+                    <canvas id="trendChart"></canvas>
+                </div>
+            </div>
+            
+            <!-- BUDGET UTILIZATION -->
+            <div class="budget-card">
+                <div class="section-header">
+                    <div class="section-title">
+                        <i class="fas fa-money-bill-wave"></i>
+                        Budget Utilization
+                    </div>
+                </div>
+                <div class="budget-grid">
+                    <div class="budget-item">
+                        <div class="budget-label">
+                            <i class="fas fa-wallet"></i> Total Budget
+                        </div>
+                        <div class="budget-value">$40K</div>
+                        <div class="budget-change">Q2 2025 Allocation</div>
+                    </div>
+                    <div class="budget-item">
+                        <div class="budget-label">
+                            <i class="fas fa-spend"></i> Spend to Date
+                        </div>
+                        <div class="budget-value">$37.4K</div>
+                        <div class="budget-change">93.5% utilized</div>
+                    </div>
+                    <div class="budget-item">
+                        <div class="budget-label">
+                            <i class="fas fa-bullseye"></i> Top Channel
+                        </div>
+                        <div class="budget-value">Twitch</div>
+                        <div class="budget-change">42% of spend</div>
+                    </div>
+                    <div class="budget-item">
+                        <div class="budget-label">
+                            <i class="fas fa-percentage"></i> Efficiency
+                        </div>
+                        <div class="budget-value">87%</div>
+                        <div class="budget-change">Above target (80%)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- RECOMMENDATIONS -->
+        <div class="recommendations">
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fas fa-lightbulb"></i>
+                    Optimization Recommendations
+                </div>
+                <div class="section-controls">
+                    <button class="control-btn" onclick="refreshRecommendations()">
+                        <i class="fas fa-sync"></i>
+                        Refresh
+                    </button>
+                </div>
+            </div>
+            
+            <div class="rec-grid">
+                <div class="rec-card">
+                    <div class="rec-header">
+                        <div class="rec-icon increase">
+                            <i class="fas fa-arrow-up"></i>
+                        </div>
+                        <div class="rec-title">INCREASE BUDGET</div>
+                    </div>
+                    <div class="rec-desc">
+                        <strong>Twitch</strong> showing 4.2x ROAS with 65% D7 retention. 
+                        Recommend increasing budget by 30% ($3.6K additional).
+                    </div>
+                </div>
+                
+                <div class="rec-card">
+                    <div class="rec-header">
+                        <div class="rec-icon decrease">
+                            <i class="fas fa-arrow-down"></i>
+                        </div>
+                        <div class="rec-title">DECREASE BUDGET</div>
+                    </div>
+                    <div class="rec-desc">
+                        <strong>Twitter</strong> underperforming with 1.8x ROAS and 45% D7 retention. 
+                        Reduce budget by 20% and reallocate to Twitch.
+                    </div>
+                </div>
+                
+                <div class="rec-card">
+                    <div class="rec-header">
+                        <div class="rec-icon optimize">
+                            <i class="fas fa-tools"></i>
+                        </div>
+                        <div class="rec-title">OPTIMIZE CREATIVES</div>
+                    </div>
+                    <div class="rec-desc">
+                        <strong>YouTube</strong> CTR below average (2.1%). 
+                        A/B test 3 new ad creatives focused on esports highlights.
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- FOOTER -->
+        <div class="footer">
+            <div class="last-updated">
+                Dashboard cập nhật lần cuối: <span style="color: var(--secondary-esports);">18:45:23</span>
+                <br>
+                <span style="font-size: 12px;">Tự động cập nhật sau: <span id="countdown">59</span>s</span>
+            </div>
+            <div class="dashboard-links">
+                <a href="#" class="dashboard-link active">Performance</a>
+                <a href="dashboard02.html" class="dashboard-link">Attribution</a>
+                <a href="dashboard03.html" class="dashboard-link">Acquisition Funnel</a>
+                <a href="../dashboard1.html" class="dashboard-link">Command Center</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // NAVIGATION BAR FUNCTIONALITY
+        // Notification panel functionality
+        const notificationBtn = document.getElementById('notification-btn');
+        const notificationPanel = document.getElementById('notification-panel');
+        const clearNotificationsBtn = document.getElementById('clear-notifications');
+        const notificationList = document.getElementById('notification-list');
+        
+        notificationBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const isVisible = notificationPanel.style.display === 'block';
+            
+            if (isVisible) {
+                notificationPanel.style.animation = 'slideOut 0.3s';
+                setTimeout(() => {
+                    notificationPanel.style.display = 'none';
+                }, 300);
+            } else {
+                notificationPanel.style.display = 'block';
+                notificationPanel.style.animation = 'slideIn 0.3s';
+            }
+        });
+        
+        clearNotificationsBtn.addEventListener('click', function() {
+            notificationList.innerHTML = '<div class="notification-item"><div class="notification-message">No notifications</div></div>';
+            notificationBtn.querySelector('.notification-badge').textContent = '0';
+            notificationBtn.querySelector('.notification-badge').style.display = 'none';
+            
+            setTimeout(() => {
+                notificationPanel.style.animation = 'slideOut 0.3s';
+                setTimeout(() => {
+                    notificationPanel.style.display = 'none';
+                }, 300);
+            }, 500);
+        });
+        
+        // Close notification panel when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!notificationPanel.contains(e.target) && !notificationBtn.contains(e.target)) {
+                notificationPanel.style.animation = 'slideOut 0.3s';
+                setTimeout(() => {
+                    notificationPanel.style.display = 'none';
+                }, 300);
+            }
+        });
+        
+        // Auto-hide nav on scroll down, show on scroll up
+        let lastScrollTop = 0;
+        const nav = document.querySelector('.global-navigation');
+        
+        window.addEventListener('scroll', function() {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            
+            if (scrollTop > lastScrollTop && scrollTop > 100) {
+                // Scroll down
+                nav.style.transform = 'translateY(-100%)';
+                nav.style.transition = 'transform 0.3s';
+            } else {
+                // Scroll up
+                nav.style.transform = 'translateY(0)';
+            }
+            
+            lastScrollTop = scrollTop;
+        });
+        
+        // Mark notification as read when clicked
+        document.addEventListener('DOMContentLoaded', function() {
+            const notificationItems = document.querySelectorAll('.notification-item');
+            
+            notificationItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    this.classList.remove('unread');
+                    
+                    // Update notification badge count
+                    const unreadCount = document.querySelectorAll('.notification-item.unread').length;
+                    const badge = notificationBtn.querySelector('.notification-badge');
+                    
+                    if (unreadCount > 0) {
+                        badge.textContent = unreadCount;
+                        badge.style.display = 'flex';
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                });
+            });
+            
+            // Highlight active navigation item based on current page
+            const currentPage = window.location.pathname.split('/').pop();
+            const navItems = document.querySelectorAll('.nav-item');
+            
+            navItems.forEach(item => {
+                const href = item.getAttribute('href');
+                if (href === currentPage || (currentPage === '' && href === 'index.html')) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+        });
+        
+        // DASHBOARD FUNCTIONALITY
+        // Dữ liệu mẫu cho channels
+        const channelData = {
+            today: [
+                {
+                    name: 'Twitch',
+                    spend: 15700,
+                    revenue: 65800,
+                    cpw: 1.12,
+                    cac: 2.45,
+                    retention: 65,
+                    arpu: 42,
+                    viral: 0.42,
+                    quality: 87
+                },
+                {
+                    name: 'Twitter',
+                    spend: 8200,
+                    revenue: 14760,
+                    cpw: 1.45,
+                    cac: 3.20,
+                    retention: 45,
+                    arpu: 28,
+                    viral: 0.35,
+                    quality: 62
+                },
+                {
+                    name: 'OpenSea',
+                    spend: 4500,
+                    revenue: 54000,
+                    cpw: 0.85,
+                    cac: 2.10,
+                    retention: 72,
+                    arpu: 120,
+                    viral: 0.28,
+                    quality: 91
+                },
+                {
+                    name: 'Discord',
+                    spend: 3800,
+                    revenue: 13300,
+                    cpw: 0.92,
+                    cac: 2.35,
+                    retention: 68,
+                    arpu: 35,
+                    viral: 0.52,
+                    quality: 83
+                },
+                {
+                    name: 'YouTube',
+                    spend: 5200,
+                    revenue: 11440,
+                    cpw: 1.28,
+                    cac: 2.95,
+                    retention: 58,
+                    arpu: 38,
+                    viral: 0.38,
+                    quality: 71
+                }
+            ],
+            week: [
+                {
+                    name: 'Twitch',
+                    spend: 105400,
+                    revenue: 442680,
+                    cpw: 1.08,
+                    cac: 2.38,
+                    retention: 67,
+                    arpu: 44,
+                    viral: 0.45,
+                    quality: 88
+                },
+                {
+                    name: 'Twitter',
+                    spend: 57400,
+                    revenue: 103320,
+                    cpw: 1.42,
+                    cac: 3.15,
+                    retention: 46,
+                    arpu: 29,
+                    viral: 0.37,
+                    quality: 64
+                },
+                {
+                    name: 'OpenSea',
+                    spend: 31500,
+                    revenue: 378000,
+                    cpw: 0.82,
+                    cac: 2.05,
+                    retention: 73,
+                    arpu: 125,
+                    viral: 0.30,
+                    quality: 92
+                },
+                {
+                    name: 'Discord',
+                    spend: 26600,
+                    revenue: 93100,
+                    cpw: 0.89,
+                    cac: 2.28,
+                    retention: 69,
+                    arpu: 36,
+                    viral: 0.55,
+                    quality: 85
+                },
+                {
+                    name: 'YouTube',
+                    spend: 36400,
+                    revenue: 80080,
+                    cpw: 1.25,
+                    cac: 2.88,
+                    retention: 59,
+                    arpu: 39,
+                    viral: 0.40,
+                    quality: 73
+                }
+            ],
+            month: [
+                {
+                    name: 'Twitch',
+                    spend: 428000,
+                    revenue: 1797600,
+                    cpw: 1.15,
+                    cac: 2.52,
+                    retention: 64,
+                    arpu: 41,
+                    viral: 0.40,
+                    quality: 85
+                },
+                {
+                    name: 'Twitter',
+                    spend: 232000,
+                    revenue: 417600,
+                    cpw: 1.48,
+                    cac: 3.35,
+                    retention: 44,
+                    arpu: 27,
+                    viral: 0.33,
+                    quality: 60
+                },
+                {
+                    name: 'OpenSea',
+                    spend: 127000,
+                    revenue: 1524000,
+                    cpw: 0.88,
+                    cac: 2.18,
+                    retention: 71,
+                    arpu: 118,
+                    viral: 0.26,
+                    quality: 90
+                },
+                {
+                    name: 'Discord',
+                    spend: 107000,
+                    revenue: 374500,
+                    cpw: 0.95,
+                    cac: 2.42,
+                    retention: 67,
+                    arpu: 34,
+                    viral: 0.48,
+                    quality: 81
+                },
+                {
+                    name: 'YouTube',
+                    spend: 147000,
+                    revenue: 323400,
+                    cpw: 1.32,
+                    cac: 3.05,
+                    retention: 57,
+                    arpu: 37,
+                    viral: 0.36,
+                    quality: 69
+                }
+            ]
+        };
+
+        let currentTimeRange = 'today';
+        let channelChart;
+        let trendChart;
+
+        // Khởi tạo dashboard
+        function initDashboard() {
+            updateChannelTable();
+            initChannelChart();
+            initTrendChart();
+            startCountdown();
+            updateDate();
+        }
+
+        // Cập nhật bảng channels
+        function updateChannelTable() {
+            const data = channelData[currentTimeRange];
+            const tableBody = document.getElementById('channel-table-body');
+            
+            tableBody.innerHTML = '';
+            
+            data.forEach(channel => {
+                const roas = (channel.revenue / channel.spend).toFixed(1);
+                const row = document.createElement('tr');
+                
+                // Tính toán class cho các metric
+                const cpwClass = channel.cpw <= 1.2 ? 'good-metric' : channel.cpw <= 1.5 ? 'warning-metric' : 'bad-metric';
+                const cacClass = channel.cac <= 2.5 ? 'good-metric' : channel.cac <= 3.5 ? 'warning-metric' : 'bad-metric';
+                const retentionClass = channel.retention >= 60 ? 'good-metric' : channel.retention >= 50 ? 'warning-metric' : 'bad-metric';
+                const roasClass = roas >= 3.5 ? 'good-metric' : roas >= 2.0 ? 'warning-metric' : 'bad-metric';
+                const qualityClass = channel.quality >= 80 ? 'good-metric' : channel.quality >= 70 ? 'warning-metric' : 'bad-metric';
+                
+                row.innerHTML = `
+                    <td>
+                        <div class="channel-name">
+                            <div class="channel-icon ${channel.name.toLowerCase()}-icon">
+                                <i class="fab fa-${channel.name.toLowerCase()}"></i>
+                            </div>
+                            ${channel.name}
+                        </div>
+                    </td>
+                    <td class="metric-cell">$${(channel.spend/1000).toFixed(1)}K</td>
+                    <td class="metric-cell">$${(channel.revenue/1000).toFixed(1)}K</td>
+                    <td class="metric-cell ${roasClass}">${roas}x</td>
+                    <td class="metric-cell ${cpwClass}">$${channel.cpw.toFixed(2)}</td>
+                    <td class="metric-cell ${cacClass}">$${channel.cac.toFixed(2)}</td>
+                    <td class="metric-cell ${retentionClass}">${channel.retention}%</td>
+                    <td class="metric-cell">$${channel.arpu}</td>
+                    <td class="metric-cell">${channel.viral.toFixed(2)}</td>
+                    <td class="metric-cell ${qualityClass}">${channel.quality}/100</td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Khởi tạo biểu đồ channel
+        function initChannelChart() {
+            const ctx = document.getElementById('channelChart').getContext('2d');
+            const data = channelData[currentTimeRange];
+            
+            channelChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.map(ch => ch.name),
+                    datasets: [
+                        {
+                            label: 'ROAS',
+                            data: data.map(ch => (ch.revenue / ch.spend).toFixed(1)),
+                            backgroundColor: 'rgba(138, 43, 226, 0.7)',
+                            borderColor: '#8a2be2',
+                            borderWidth: 1,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'CPW ($)',
+                            data: data.map(ch => ch.cpw),
+                            backgroundColor: 'rgba(0, 255, 136, 0.7)',
+                            borderColor: '#00ff88',
+                            borderWidth: 1,
+                            yAxisID: 'y1'
+                        },
+                        {
+                            label: 'D7 Retention (%)',
+                            data: data.map(ch => ch.retention),
+                            backgroundColor: 'rgba(255, 170, 0, 0.7)',
+                            borderColor: '#ffaa00',
+                            borderWidth: 1,
+                            yAxisID: 'y2',
+                            hidden: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                color: '#a0a0c0',
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(26, 26, 46, 0.9)',
+                            titleColor: '#ffffff',
+                            bodyColor: '#ffffff',
+                            borderColor: '#8a2be2',
+                            borderWidth: 1
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.05)'
+                            },
+                            ticks: {
+                                color: '#a0a0c0'
+                            }
+                        },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: 'ROAS (x)',
+                                color: '#8a2be2'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.05)'
+                            },
+                            ticks: {
+                                color: '#a0a0c0'
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: 'CPW ($)',
+                                color: '#00ff88'
+                            },
+                            grid: {
+                                drawOnChartArea: false,
+                            },
+                            ticks: {
+                                color: '#a0a0c0'
+                            }
+                        },
+                        y2: {
+                            type: 'linear',
+                            display: false,
+                            position: 'right',
+                            grid: {
+                                drawOnChartArea: false,
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Khởi tạo biểu đồ trend
+        function initTrendChart() {
+            const ctx = document.getElementById('trendChart').getContext('2d');
+            
+            trendChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Apr 15', 'Apr 16', 'Apr 17', 'Apr 18', 'Apr 19', 'Apr 20', 'Apr 21', 'Apr 22'],
+                    datasets: [
+                        {
+                            label: 'Marketing Spend',
+                            data: [4800, 5200, 5100, 5300, 5500, 5400, 5600, 5700],
+                            borderColor: '#8a2be2',
+                            backgroundColor: 'rgba(138, 43, 226, 0.1)',
+                            borderWidth: 3,
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: 'Marketing Revenue',
+                            data: [15800, 17200, 16500, 17800, 18500, 18200, 19200, 19800],
+                            borderColor: '#00ff88',
+                            backgroundColor: 'rgba(0, 255, 136, 0.1)',
+                            borderWidth: 3,
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: 'ROAS (Right)',
+                            data: [3.3, 3.3, 3.2, 3.4, 3.4, 3.4, 3.4, 3.5],
+                            borderColor: '#ffaa00',
+                            backgroundColor: 'transparent',
+                            borderWidth: 3,
+                            tension: 0.4,
+                            borderDash: [5, 5],
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                color: '#a0a0c0',
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.05)'
+                            },
+                            ticks: {
+                                color: '#a0a0c0',
+                                callback: function(value) {
+                                    return '$' + value;
+                                }
+                            }
+                        },
+                        y1: {
+                            position: 'right',
+                            grid: {
+                                drawOnChartArea: false,
+                            },
+                            ticks: {
+                                color: '#a0a0c0',
+                                callback: function(value) {
+                                    return value + 'x';
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.05)'
+                            },
+                            ticks: {
+                                color: '#a0a0c0'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Thay đổi time range
+        function changeTimeRange(range) {
+            // Cập nhật nút active
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            currentTimeRange = range;
+            updateChannelTable();
+            
+            // Cập nhật biểu đồ
+            if (channelChart) {
+                channelChart.destroy();
+            }
+            initChannelChart();
+            
+            // Cập nhật KPI cards
+            updateKPICards(range);
+        }
+
+        // Cập nhật KPI cards
+        function updateKPICards(range) {
+            const data = channelData[range];
+            let totalSpend = 0;
+            let totalRevenue = 0;
+            let totalWallets = 0;
+            
+            data.forEach(channel => {
+                totalSpend += channel.spend;
+                totalRevenue += channel.revenue;
+                totalWallets += channel.spend / channel.cpw;
+            });
+            
+            const roi = (totalRevenue / totalSpend).toFixed(1);
+            const cac = totalSpend / totalWallets;
+            const contribution = ((totalRevenue / 142000) * 100).toFixed(0);
+            
+            document.querySelector('.roi .kpi-value').textContent = roi + 'x';
+            document.querySelector('.spend .kpi-value').textContent = '$' + (totalSpend/1000).toFixed(1) + 'K';
+            document.querySelector('.cac .kpi-value').textContent = '$' + cac.toFixed(2);
+            document.querySelector('.revenue .kpi-value').textContent = contribution + '%';
+        }
+
+        // Sắp xếp theo metric
+        function sortByMetric(metric) {
+            const data = channelData[currentTimeRange];
+            
+            data.sort((a, b) => {
+                if (metric === 'roas') {
+                    return (b.revenue / b.spend) - (a.revenue / a.spend);
+                } else if (metric === 'cpw') {
+                    return a.cpw - b.cpw;
+                } else if (metric === 'retention') {
+                    return b.retention - a.retention;
+                }
+                return 0;
+            });
+            
+            updateChannelTable();
+            channelChart.destroy();
+            initChannelChart();
+            
+            showAlert(`Đã sắp xếp theo ${metric.toUpperCase()}`);
+        }
+
+        // Xuất dữ liệu
+        function exportChannelData() {
+            alert('Đang xuất dữ liệu channel ra CSV...\n\nFile: Marketing_Channel_Data_' + currentTimeRange + '.csv');
+        }
+
+        // Refresh recommendations
+        function refreshRecommendations() {
+            showAlert('Đang refresh optimization recommendations...');
+        }
+
+        // Cập nhật ngày hiện tại
+        function updateDate() {
+            const now = new Date();
+            const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+            document.getElementById('current-date').textContent = now.toLocaleDateString('vi-VN', options);
+        }
+
+        // Countdown
+        function startCountdown() {
+            let seconds = 59;
+            const countdownElement = document.getElementById('countdown');
+            
+            setInterval(() => {
+                countdownElement.textContent = seconds;
+                seconds--;
+                
+                if (seconds < 0) {
+                    seconds = 59;
+                    // Auto-refresh data
+                    showAlert('Đang cập nhật dữ liệu mới...');
+                }
+            }, 1000);
+        }
+
+        // Show alert
+        function showAlert(message) {
+            const alertDiv = document.createElement('div');
+            alertDiv.style.cssText = `
+                position: fixed;
+                top: 80px;
+                right: 20px;
+                background-color: var(--card-bg);
+                color: var(--text-primary);
+                padding: 15px 20px;
+                border-radius: 10px;
+                border-left: 4px solid var(--primary-web3);
+                box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+                z-index: 1000;
+                max-width: 400px;
+                animation: slideIn 0.3s;
+                border: 1px solid var(--card-border);
+            `;
+            
+            alertDiv.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-info-circle" style="color: var(--primary-web3);"></i>
+                    <div>${message}</div>
+                </div>
+            `;
+            
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                alertDiv.style.animation = 'slideOut 0.3s';
+                setTimeout(() => {
+                    document.body.removeChild(alertDiv);
+                }, 300);
+            }, 3000);
+        }
+
+        // Add CSS for animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Khởi tạo
+        document.addEventListener('DOMContentLoaded', function() {
+            initDashboard();
+            
+            // Thêm hover effects cho cards
+            document.querySelectorAll('.kpi-card, .budget-item, .rec-card').forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-4px)';
+                    this.style.boxShadow = '0 12px 40px rgba(0, 0, 0, 0.4)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = 'var(--shadow)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
