@@ -152,6 +152,8 @@
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s;
+            text-decoration: none;
+            color: inherit;
         }
         
         .user-profile:hover {
@@ -161,13 +163,17 @@
         .user-avatar {
             width: 36px;
             height: 36px;
-            background: linear-gradient(135deg, var(--primary-web3), var(--secondary-esports));
             border-radius: 50%;
+            overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-size: 14px;
+        }
+        
+        .user-avatar-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
         
         .user-info {
@@ -927,7 +933,7 @@
                     <span>Funnel</span>
                 </a>
                 <div class="nav-divider"></div>
-                <a href="dashboard1.html" class="nav-item">
+                <a href="../dashboard1.html" class="nav-item">
                     <i class="fas fa-command"></i>
                     <span>Command Center</span>
                 </a>
@@ -938,15 +944,15 @@
                     <i class="fas fa-bell"></i>
                     <span class="notification-badge">3</span>
                 </button>
-                <div class="user-profile">
+                <a href="https://h13digital.github.io/#portfolio" class="user-profile" target="_self">
                     <div class="user-avatar">
-                        <i class="fas fa-user"></i>
+                        <img src="https://avatars.githubusercontent.com/u/247514700" alt="HIEP NGUYEN" class="user-avatar-img">
                     </div>
                     <div class="user-info">
                         <span class="user-name">HIEP NGUYEN</span>
                         <span class="user-role">Marketing Architect</span>
                     </div>
-                </div>
+                </a>
             </div>
         </div>
     </nav>
@@ -1229,7 +1235,7 @@
                 <a href="#" class="dashboard-link active">Performance</a>
                 <a href="dashboard02.html" class="dashboard-link">Attribution</a>
                 <a href="dashboard03.html" class="dashboard-link">Acquisition Funnel</a>
-                <a href="dashboard1.html" class="dashboard-link">Command Center</a>
+                <a href="../dashboard1.html" class="dashboard-link">Command Center</a>
             </div>
         </div>
     </div>
@@ -1332,6 +1338,15 @@
                     item.classList.remove('active');
                 }
             });
+            
+            // Add fallback for avatar image
+            const avatarImg = document.querySelector('.user-avatar-img');
+            if (avatarImg) {
+                avatarImg.onerror = function() {
+                    this.onerror = null;
+                    this.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36"><rect width="36" height="36" fill="%238a2be2"/><text x="18" y="22" font-size="14" fill="white" text-anchor="middle" font-family="Arial, sans-serif">HN</text></svg>';
+                };
+            }
         });
         
         // DASHBOARD FUNCTIONALITY
