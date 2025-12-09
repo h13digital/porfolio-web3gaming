@@ -158,22 +158,31 @@
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s;
+            text-decoration: none;
+            color: inherit;
         }
         
         .user-profile:hover {
             background-color: rgba(138, 43, 226, 0.1);
+            text-decoration: none;
+            color: inherit;
         }
         
         .user-avatar {
             width: 36px;
             height: 36px;
-            background: linear-gradient(135deg, var(--primary-web3), var(--secondary-esports));
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-size: 14px;
+            overflow: hidden;
+            border: 2px solid rgba(138, 43, 226, 0.3);
+        }
+        
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
         
         .user-info {
@@ -1114,7 +1123,7 @@
                     <span>Funnel</span>
                 </a>
                 <div class="nav-divider"></div>
-                <a href="dashboard1.html" class="nav-item">
+                <a href="../dashboard1.html" class="nav-item">
                     <i class="fas fa-command"></i>
                     <span>Command Center</span>
                 </a>
@@ -1125,15 +1134,15 @@
                     <i class="fas fa-bell"></i>
                     <span class="notification-badge">3</span>
                 </button>
-                <div class="user-profile">
+                <a href="https://h13digital.github.io/#portfolio" class="user-profile" id="user-profile-link">
                     <div class="user-avatar">
-                        <i class="fas fa-user"></i>
+                        <img src="https://avatars.githubusercontent.com/u/247514700" alt="HIEP NGUYEN" onerror="this.onerror=null; this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%238a2be2%22/><text x=%2250%22 y=%2260%22 text-anchor=%22middle%22 fill=%22white%22 font-size=%2240%22>H</text></svg>'">
                     </div>
                     <div class="user-info">
                         <span class="user-name">HIEP NGUYEN</span>
                         <span class="user-role">Marketing Architect</span>
                     </div>
-                </div>
+                </a>
             </div>
         </div>
     </nav>
@@ -1597,7 +1606,7 @@
                 <a href="dashboard01.html" class="dashboard-link">Performance</a>
                 <a href="dashboard02.html" class="dashboard-link">Attribution</a>
                 <a href="#" class="dashboard-link active">Acquisition Funnel</a>
-                <a href="dashboard1.html" class="dashboard-link">Command Center</a>
+                <a href="../dashboard1.html" class="dashboard-link">Command Center</a>
             </div>
         </div>
     </div>
@@ -1608,6 +1617,14 @@
         const notificationPanel = document.getElementById('notification-panel');
         const clearNotificationsBtn = document.getElementById('clear-notifications');
         const notificationList = document.getElementById('notification-list');
+        const userProfileLink = document.getElementById('user-profile-link');
+        
+        // Thêm sự kiện click để redirect về portfolio
+        userProfileLink.addEventListener('click', function(e) {
+            // Đảm bảo mở trong cùng cửa sổ (không mở tab mới)
+            e.preventDefault();
+            window.location.href = this.href;
+        });
         
         notificationBtn.addEventListener('click', function(e) {
             e.stopPropagation();
